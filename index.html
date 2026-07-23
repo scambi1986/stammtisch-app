@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hundefreunde Hasloh e.V. – Stammtisch</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#2f5d3f">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f3e8d2;font-family:'Work Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  html,body,#root{height:100%}
+  a{color:#b5651d;text-decoration:none}a:hover{color:#8f4f16}
+  .scr::-webkit-scrollbar{width:0}
+  @keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+  @keyframes slidein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+<div style="height:100vh;height:100dvh;width:100%;background:#f3e8d2;overflow:hidden;position:relative;display:flex;flex-direction:column">
+
+    <div style="flex:none;height:env(safe-area-inset-top)"></div>
+
+    <div class="scr" style="flex:1;overflow-y:auto;overflow-x:hidden">
+
+      <!-- ============ MITGLIED WÄHLEN ============ -->
+      <sc-if value="{{ isPicker }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slidein .25s ease;padding:32px 20px;min-height:100%;display:flex;flex-direction:column">
+        <div style="text-align:center;margin-bottom:24px">
+          <div style="font-size:36px">🐾</div>
+          <div style="font:600 22px 'Oswald';color:#2b2016;margin-top:8px">Wer bist du?</div>
+          <div style="font:500 13px 'Work Sans';color:#8a7860;margin-top:4px">Wird auf diesem Gerät gemerkt</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <sc-for list="{{ pickerMembers }}" as="m" hint-placeholder-count="10">
+            <button onClick="{{ m.pick }}" style="display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:16px 8px;cursor:pointer">
+              <div style="width:44px;height:44px;border-radius:50%;background:{{ m.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 16px 'Oswald'">{{ m.initials }}</div>
+              <span style="font:600 14px 'Work Sans';color:#2b2016">{{ m.name }} {{ m.dogIcon }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ HOME ============ -->
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:slidein .25s ease">
+        <div style="background:linear-gradient(160deg,#2f5d3f,#24472f);padding:20px 22px 26px;color:#f3e8d2">
+          <div style="display:flex;align-items:center;gap:11px">
+            <div style="width:44px;height:44px;border-radius:50%;background:#f3e8d2;display:flex;align-items:center;justify-content:center;font-size:24px;flex:none">🐾</div>
+            <div>
+              <div style="font:700 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#a9c9b3">Hundefreunde Hasloh e.V.</div>
+              <div style="font:600 20px 'Oswald';letter-spacing:.5px">Moin Hundefreund {{ meName }}! Grüß dich erstmal zum Stammtisch!</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:16px 16px 4px;margin-top:-14px">
+          <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:20px;padding:16px 16px 14px;box-shadow:0 8px 22px rgba(60,40,20,.12)">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div style="font:600 10px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#b5651d">Nächster Stammtisch</div>
+                <div style="font:600 24px 'Oswald';color:#2b2016;line-height:1.1;margin-top:4px">{{ nextDateLong }}</div>
+                <button onClick="{{ goInfo }}" style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;background:none;border:none;padding:0;cursor:pointer;font:500 13px 'Work Sans';color:#b5651d">🍺 Kneipe Fasan · Eimsbüttel · ab 19 Uhr <span style="font-family:'Oswald'">ⓘ</span></button>
+              </div>
+            </div>
+            <sc-if value="{{ hasOpenRounds }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:14px;padding-top:13px;border-top:1px dashed #e4d5b8">
+              <div style="font:600 10px 'Work Sans';letter-spacing:1px;text-transform:uppercase;color:#8a6d1e;margin-bottom:8px">Offene Runden</div>
+              <sc-for list="{{ openRounds }}" as="r" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                  <div style="width:32px;height:32px;border-radius:50%;background:{{ r.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Oswald';flex:none">{{ r.initials }}</div>
+                  <div style="flex:1;min-width:0"><div style="font:600 14px 'Work Sans';color:#2b2016">{{ r.name }}</div><div style="font:500 11px 'Work Sans';color:#8a7860">💬 {{ r.reason }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+            </sc-if>
+            <sc-if value="{{ noOpenRounds }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:14px;padding-top:13px;border-top:1px dashed #e4d5b8;font:500 13px 'Work Sans';color:#8a7860">🍺 Aktuell schuldet niemand eine Runde. Prost!</div>
+            </sc-if>
+            <button onClick="{{ goRunde }}" style="width:100%;margin-top:13px;border:none;background:#8a6d1e;color:#fff;font:600 14px 'Work Sans';padding:12px;border-radius:12px;cursor:pointer">Wer zahlt? →</button>
+          </div>
+        </div>
+
+        <div style="padding:6px 16px 2px;font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin-top:8px">Am Tisch</div>
+        <div style="padding:0 16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:11px">
+          <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.go }}" style="text-align:left;border:1px solid #e4d5b8;background:{{ t.bg }};border-radius:18px;padding:15px 14px;cursor:pointer;box-shadow:0 4px 12px rgba(60,40,20,.07);display:flex;flex-direction:column;gap:9px;min-height:104px;justify-content:space-between">
+              <div style="font-size:28px">{{ t.icon }}</div>
+              <div>
+                <div style="font:600 16px 'Oswald';color:#2b2016;letter-spacing:.3px">{{ t.title }}</div>
+                <div style="font:500 12px 'Work Sans';color:#7a6a54;margin-top:1px">{{ t.sub }}</div>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+        <div style="padding:0 16px 24px;text-align:center">
+          <button onClick="{{ logout }}" style="background:none;border:none;padding:0;cursor:pointer;font:500 12px 'Work Sans';color:#a08a6e">Nicht {{ meName }}? Nutzer wechseln</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ INFO / KNEIPE FASAN ============ -->
+      <sc-if value="{{ isInfo }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slidein .25s ease;padding-bottom:24px">
+        <div style="padding:14px 16px 0">
+          <button onClick="{{ goHome }}" style="background:none;border:none;padding:6px 0;cursor:pointer;font:600 14px 'Work Sans';color:#2f5d3f">← Zurück</button>
+        </div>
+        <div style="position:relative;height:150px;margin:8px 16px 0;border-radius:18px;overflow:hidden;background:#e7dcc4">
+          <image-slot id="fasan_photo" shape="rect" placeholder="Foto der Kneipe Fasan ablegen"></image-slot>
+        </div>
+        <div style="padding:14px 16px 0">
+          <div style="font:600 26px 'Oswald';color:#2b2016">Kneipe Fasan</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+            <span style="font:700 14px 'Oswald';color:#b5651d">4,7 ★</span>
+            <span style="font:500 12px 'Work Sans';color:#8a7860">752 Rezensionen · Kneipe</span>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <a href="tel:040400979" style="flex:1;text-align:center;background:#2f5d3f;color:#f3e8d2;font:600 13px 'Work Sans';padding:11px;border-radius:12px">📞 Anrufen</a>
+            <a href="https://maps.google.com/?q=Eichenstraße+10,+20259+Hamburg" target="_blank" style="flex:1;text-align:center;background:#fff8ec;border:1px solid #e4d5b8;color:#2f5d3f;font:600 13px 'Work Sans';padding:11px;border-radius:12px">📍 Route</a>
+            <a href="https://fasan-hamburg.de" target="_blank" style="flex:1;text-align:center;background:#fff8ec;border:1px solid #e4d5b8;color:#2f5d3f;font:600 13px 'Work Sans';padding:11px;border-radius:12px">🍽 Menü</a>
+          </div>
+
+          <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:14px 15px;margin-top:14px">
+            <div style="display:flex;gap:10px;margin-bottom:10px"><span style="font-size:16px">📍</span><div><div style="font:600 14px 'Work Sans';color:#2b2016">Eichenstraße 10</div><div style="font:500 13px 'Work Sans';color:#8a7860">20259 Hamburg-Eimsbüttel</div></div></div>
+            <div style="display:flex;gap:10px;padding-top:10px;border-top:1px solid #efe2c8"><span style="font-size:16px">📞</span><div><div style="font:600 14px 'Work Sans';color:#2b2016">040 400979</div><div style="font:500 13px 'Work Sans';color:#8a7860">🚆 22 Min · 🚗 7 Min Hinreise</div></div></div>
+          </div>
+
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:20px 4px 10px">Datenanbindung</div>
+          <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:14px 15px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <span style="font:600 13px 'Work Sans';color:#2b2016">Google Sheet</span>
+              <span style="font:600 11px 'Work Sans';color:#8a7860">{{ sheetStatusLabel }}</span>
+            </div>
+            <sc-if value="{{ sheetConnected }}" hint-placeholder-val="{{ false }}">
+            <div style="font:500 12px 'Work Sans';color:#8a7860;word-break:break-all;margin-bottom:10px">{{ sheetUrl }}</div>
+            <button onClick="{{ disconnectSheet }}" style="width:100%;border:1px solid #e4d5b8;background:#fff;color:#a13d2d;font:600 13px 'Work Sans';padding:10px;border-radius:11px;cursor:pointer">Trennen</button>
+            </sc-if>
+            <sc-if value="{{ sheetNotConnected }}" hint-placeholder-val="{{ true }}">
+            <div style="font:500 12px 'Work Sans';color:#8a7860;margin-bottom:10px;line-height:1.4">Apps-Script-Web-App-URL einfügen, um die Statistik live aus dem Google Sheet zu ziehen.</div>
+            <input type="text" value="{{ sheetUrlDraft }}" onChange="{{ setSheetUrlDraft }}" placeholder="https://script.google.com/macros/s/…/exec" style="width:100%;border:1px solid #e4d5b8;border-radius:11px;padding:10px 12px;font:500 13px 'Work Sans';margin-bottom:10px;box-sizing:border-box" />
+            <button onClick="{{ saveSheetUrl }}" style="width:100%;border:none;background:#2f5d3f;color:#f3e8d2;font:600 13px 'Work Sans';padding:10px;border-radius:11px;cursor:pointer">Verbinden</button>
+            </sc-if>
+          </div>
+
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:20px 4px 10px">Öffnungszeiten</div>
+          <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:6px 15px">
+            <sc-for list="{{ fasanHours }}" as="h" hint-placeholder-count="7">
+              <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f3e8d2">
+                <span style="font-weight:{{ h.w }};font-family:'Work Sans';font-size:14px;color:#2b2016">{{ h.day }}</span>
+                <span style="font:600 14px 'Oswald';color:#5c4c38">{{ h.time }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font:500 12px 'Work Sans';color:#2f5d3f;margin:8px 4px 0">Stammtisch: jeden 1. Mittwoch im Monat</div>
+
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:20px 4px 10px">Gut zu wissen</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ fasanServices }}" as="sv" hint-placeholder-count="4">
+              <div style="background:#eaf1ec;border:1px solid #d3e2d8;border-radius:20px;padding:7px 13px;font:500 12px 'Work Sans';color:#2f5d3f">{{ sv }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ TERMIN / ZUSAGEN ============ -->
+      <sc-if value="{{ isTermin }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slidein .25s ease;padding-bottom:20px">
+        <div style="padding:18px 20px 16px;background:#2f5d3f;color:#f3e8d2">
+          <div style="font:600 10px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#a9c9b3">Teilnahme</div>
+          <div style="font:600 22px 'Oswald';margin-top:2px">Stammtisch am {{ nextDateShort }}</div>
+        </div>
+        <div style="padding:16px">
+          <!-- own answer -->
+          <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:20px;padding:16px 16px 15px;box-shadow:0 6px 18px rgba(60,40,20,.1)">
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:14px">
+              <div style="width:42px;height:42px;border-radius:50%;background:{{ meColor }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 16px 'Oswald';flex:none">{{ meInitials }}</div>
+              <div>
+                <div style="font:600 10px 'Work Sans';letter-spacing:1px;text-transform:uppercase;color:#b5651d">Du</div>
+                <div style="font:600 17px 'Oswald';color:#2b2016;line-height:1.1">{{ meName }} {{ meDogIcon }}</div>
+              </div>
+            </div>
+            <div style="font:500 13px 'Work Sans';color:#6b5b47;margin-bottom:10px">Bist du dabei?</div>
+            <div style="display:flex;gap:10px">
+              <button onClick="{{ meSetYes }}" style="flex:1;border:1.5px solid {{ meYesBorder }};background:{{ meYesBg }};color:{{ meYesColor }};font:600 15px 'Work Sans';padding:13px;border-radius:14px;cursor:pointer">✓ Ich bin dabei</button>
+              <button onClick="{{ meSetNo }}" style="flex:1;border:1.5px solid {{ meNoBorder }};background:{{ meNoBg }};color:{{ meNoColor }};font:600 15px 'Work Sans';padding:13px;border-radius:14px;cursor:pointer">✕ Diesmal nicht</button>
+            </div>
+          </div>
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:20px 4px 10px">Wer kommt noch · {{ yesCount }} Zusagen</div>
+          <sc-for list="{{ othersRows }}" as="m" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:12px;background:#fff8ec;border:1px solid #e4d5b8;border-radius:14px;padding:10px 13px;margin-bottom:8px">
+              <div style="width:34px;height:34px;border-radius:50%;background:{{ m.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 14px 'Oswald';flex:none">{{ m.initials }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font:600 14px 'Work Sans';color:#2b2016">{{ m.name }} {{ m.dogIcon }}</div>
+              </div>
+              <div style="font:600 12px 'Work Sans';color:{{ m.statusColor }};background:{{ m.statusBg }};padding:5px 11px;border-radius:20px">{{ m.statusLabel }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ GETRÄNKE ============ -->
+      <sc-if value="{{ isGetraenke }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slidein .25s ease;padding-bottom:20px">
+        <div style="padding:18px 20px 16px;background:#7a3b12;color:#f3e8d2">
+          <div style="font:600 10px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#e6b88a">Meine Strichliste</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end">
+            <div style="font:600 22px 'Oswald';margin-top:2px">{{ meName }}s Zähler</div>
+            <div style="text-align:right"><div style="font:700 26px 'Oswald';line-height:1">{{ meDrinkTotal }}</div><div style="font:500 10px 'Work Sans';color:#e6b88a">Getränke</div></div>
+          </div>
+        </div>
+        <div style="padding:16px">
+          <sc-for list="{{ meDrinks }}" as="d" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:11px;background:{{ d.rowBg }};border:1px solid #e4d5b8;border-radius:15px;padding:11px 13px;margin-bottom:9px">
+              <div style="flex:1;min-width:0">
+                <div style="font:600 15px 'Work Sans';color:#2b2016">{{ d.label }}</div>
+                <div style="font:500 12px 'Work Sans';color:#8a7860">{{ d.priceLabel }} · {{ d.lineLabel }}</div>
+              </div>
+              <button onClick="{{ d.dec }}" style="width:34px;height:34px;border-radius:10px;border:none;background:#efe2c8;color:#7a6a54;font-size:20px;cursor:pointer;flex:none">−</button>
+              <span style="min-width:24px;text-align:center;font:700 20px 'Oswald';color:#2b2016">{{ d.count }}</span>
+              <button onClick="{{ d.inc }}" style="width:34px;height:34px;border-radius:10px;border:none;background:#2f5d3f;color:#fff;font-size:20px;cursor:pointer;flex:none">+</button>
+            </div>
+          </sc-for>
+          <div style="background:{{ customRowBg }};border:1px solid #e4d5b8;border-radius:15px;padding:11px 13px;margin-bottom:9px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+              <input type="text" value="{{ customName }}" onChange="{{ setCustomName }}" placeholder="Weitere Getränk…" style="flex:1;min-width:0;border:1px solid #e4d5b8;background:#fff;border-radius:9px;padding:8px 10px;font:600 13px 'Work Sans';color:#2b2016" />
+              <div style="display:flex;align-items:center;gap:4px;flex:none">
+                <input type="number" step="0.10" min="0" value="{{ customPrice }}" onChange="{{ setCustomPrice }}" style="width:62px;border:1px solid #e4d5b8;background:#fff;border-radius:9px;padding:8px 6px;font:600 13px 'Work Sans';color:#2b2016" />
+                <span style="font:500 12px 'Work Sans';color:#8a7860">€</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:11px">
+              <div style="flex:1;font:500 12px 'Work Sans';color:#8a7860">{{ customLineLabel }}</div>
+              <button onClick="{{ customDec }}" style="width:34px;height:34px;border-radius:10px;border:none;background:#efe2c8;color:#7a6a54;font-size:20px;cursor:pointer;flex:none">−</button>
+              <span style="min-width:24px;text-align:center;font:700 20px 'Oswald';color:#2b2016">{{ customCount }}</span>
+              <button onClick="{{ customInc }}" style="width:34px;height:34px;border-radius:10px;border:none;background:#2f5d3f;color:#fff;font-size:20px;cursor:pointer;flex:none">+</button>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#2b2016;color:#f3e8d2;border-radius:16px;padding:15px 18px;margin-top:14px">
+            <div><div style="font:600 10px 'Work Sans';letter-spacing:1px;text-transform:uppercase;color:#c9b59a">Deine Zeche</div><div style="font:500 12px 'Work Sans';color:#c9b59a">{{ meDrinkTotal }} Getränke</div></div>
+            <div style="font:700 30px 'Oswald'">{{ meCost }}</div>
+          </div>
+          <button onClick="{{ finishStammtisch }}" style="width:100%;margin-top:12px;border:1px solid #2f5d3f;background:#eaf1ec;color:#2f5d3f;font:600 13px 'Work Sans';padding:12px;border-radius:12px;cursor:pointer">✓ Stammtisch abschließen – zählt jetzt in der Statistik</button>
+          <sc-if value="{{ hasFinishMsg }}" hint-placeholder-val="{{ false }}">
+          <div style="font:500 12px 'Work Sans';color:#2f5d3f;text-align:center;margin-top:8px">{{ finishMsg }}</div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ RUNDE ============ -->
+      <sc-if value="{{ isRunde }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slidein .25s ease;padding-bottom:20px">
+        <div style="padding:18px 20px 16px;background:#8a6d1e;color:#f3e8d2">
+          <div style="font:600 10px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#e6d08a">Getränkerunden</div>
+          <div style="font:600 22px 'Oswald';margin-top:2px">Wer zahlt – und warum?</div>
+        </div>
+        <div style="padding:18px 16px">
+
+          <!-- debt summary -->
+          <sc-if value="{{ hasDebt }}" hint-placeholder-val="{{ false }}">
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:0 4px 10px">Schuldenstand</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+            <sc-for list="{{ debtRows }}" as="m" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:8px;background:#fff8ec;border:1px solid #e4d5b8;border-radius:20px;padding:6px 12px 6px 6px">
+                <div style="width:26px;height:26px;border-radius:50%;background:{{ m.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px 'Oswald'">{{ m.initials }}</div>
+                <span style="font:600 13px 'Work Sans';color:#2b2016">{{ m.name }}</span>
+                <span style="font:600 12px 'Work Sans';color:#8a6d1e">{{ m.countLabel }}</span>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+
+          <!-- open rounds -->
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:0 4px 10px">Offene Runden</div>
+          <sc-if value="{{ hasOpenRounds }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ openRounds }}" as="r" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:12px;background:#fff8ec;border:1px solid #e4d5b8;border-radius:14px;padding:10px 12px;margin-bottom:8px">
+              <div style="width:32px;height:32px;border-radius:50%;background:{{ r.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Oswald';flex:none">{{ r.initials }}</div>
+              <div style="flex:1;min-width:0"><div style="font:600 14px 'Work Sans';color:#2b2016">{{ r.name }}</div><div style="font:500 12px 'Work Sans';color:#8a7860">💬 {{ r.reason }}</div></div>
+              <button onClick="{{ r.markPaid }}" style="border:1px solid #2f5d3f;background:#eaf1ec;color:#2f5d3f;font:600 12px 'Work Sans';padding:8px 12px;border-radius:10px;cursor:pointer;flex:none">✓ Bezahlt</button>
+              <button onClick="{{ r.remove }}" style="width:30px;height:30px;border-radius:9px;border:1px solid #e4d5b8;background:#fff;color:#a13d2d;font-size:16px;cursor:pointer;flex:none">✕</button>
+            </div>
+          </sc-for>
+          </sc-if>
+          <sc-if value="{{ noOpenRounds }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff8ec;border:1px dashed #e4d5b8;border-radius:16px;padding:20px;text-align:center;font:500 14px 'Work Sans';color:#8a7860">🍺 Aktuell keine offene Runde. Prost!</div>
+          </sc-if>
+
+          <!-- add a round -->
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:24px 4px 10px">Runde eintragen</div>
+          <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:14px">
+            <div style="font:500 12px 'Work Sans';color:#8a7860;margin-bottom:8px">1 · Wer?</div>
+            <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px">
+              <sc-for list="{{ addMembers }}" as="m" hint-placeholder-count="6">
+                <button onClick="{{ m.select }}" style="flex:none;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:52px">
+                  <div style="width:42px;height:42px;border-radius:50%;background:{{ m.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 15px 'Oswald';opacity:{{ m.op }};box-shadow:0 0 0 3px {{ m.ring }}">{{ m.initials }}</div>
+                  <span style="font:500 10px 'Work Sans';color:#5c4c38;white-space:nowrap">{{ m.name }} {{ m.dogIcon }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="font:500 12px 'Work Sans';color:#8a7860;margin-bottom:8px">2 · Warum?</div>
+            <input type="text" value="{{ addReasonDraft }}" onChange="{{ setAddReasonDraft }}" placeholder="z. B. hat keinen Hund…" style="width:100%;border:1px solid #e4d5b8;background:#fff;border-radius:11px;padding:10px 12px;font:500 13px 'Work Sans';color:#2b2016;margin-bottom:14px" />
+            <button onClick="{{ addRound }}" disabled="{{ addDisabled }}" style="width:100%;border:none;background:#2f5d3f;color:#f3e8d2;font:600 14px 'Work Sans';padding:12px;border-radius:12px;cursor:pointer;opacity:{{ addOpacity }}">+ Runde hinzufügen</button>
+          </div>
+
+          <!-- paid rounds -->
+          <sc-if value="{{ hasPaidRounds }}" hint-placeholder-val="{{ false }}">
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:24px 4px 10px">Bezahlt</div>
+          <sc-for list="{{ paidRounds }}" as="r" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:12px;background:#f3ede0;border:1px solid #e4d5b8;border-radius:14px;padding:10px 12px;margin-bottom:8px;opacity:.75">
+              <div style="width:32px;height:32px;border-radius:50%;background:{{ r.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Oswald';flex:none">{{ r.initials }}</div>
+              <div style="flex:1;min-width:0"><div style="font:600 14px 'Work Sans';color:#2b2016;text-decoration:line-through">{{ r.name }}</div><div style="font:500 12px 'Work Sans';color:#8a7860">💬 {{ r.reason }}</div></div>
+              <button onClick="{{ r.markUnpaid }}" style="border:1px solid #e4d5b8;background:#fff;color:#8a6d1e;font:600 12px 'Work Sans';padding:8px 10px;border-radius:10px;cursor:pointer;flex:none">↺ Zurücksetzen</button>
+            </div>
+          </sc-for>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ DART ============ -->
+      <sc-if value="{{ isDart }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slidein .25s ease;padding-bottom:16px">
+        <div style="padding:18px 20px 14px;background:#1f1f24;color:#f3e8d2">
+          <div style="font:600 10px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#c9c9d4">Dart</div>
+          <div style="font:600 22px 'Oswald';margin-top:2px">🎯 Zählwerk</div>
+        </div>
+
+        <!-- setup: Modus + Spieler waehlen -->
+        <sc-if value="{{ dartNotStarted }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:14px 16px 0">
+          <div style="display:flex;gap:6px;background:#000;border-radius:12px;padding:4px;margin-bottom:14px">
+            <sc-for list="{{ dartTabs }}" as="t" hint-placeholder-count="3">
+              <button onClick="{{ t.go }}" style="flex:1;border:none;background:{{ t.bg }};color:{{ t.color }};font:600 13px 'Work Sans';padding:8px;border-radius:9px;cursor:pointer">{{ t.label }}</button>
+            </sc-for>
+          </div>
+          <div style="font:500 12px 'Work Sans';color:#8a7860;margin-bottom:8px">Mitspieler antippen (2–6)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;background:#fff8ec;border:1px solid #e4d5b8;border-radius:14px;padding:14px;margin-bottom:14px">
+            <sc-for list="{{ dartPickerOptions }}" as="o" hint-placeholder-count="10">
+              <button onClick="{{ o.toggle }}" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;width:50px">
+                <div style="width:38px;height:38px;border-radius:50%;background:{{ o.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Oswald';opacity:{{ o.opacity }};box-shadow:0 0 0 2px {{ o.color }}">{{ o.initials }}</div>
+                <span style="font:500 9px 'Work Sans';color:#5c4c38;white-space:nowrap">{{ o.name }} {{ o.dogIcon }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <button onClick="{{ startDartRound }}" style="width:100%;border:none;background:#2f5d3f;color:#f3e8d2;font:600 15px 'Work Sans';padding:14px;border-radius:14px;cursor:pointer">▶ Runde starten</button>
+        </div>
+        </sc-if>
+
+        <!-- laufende Runde -->
+        <sc-if value="{{ dartStarted }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:14px 16px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#fff8ec;border:1px solid #e4d5b8;border-radius:12px;padding:9px 13px;margin-bottom:12px">
+            <span style="font:500 13px 'Work Sans';color:#5c4c38">{{ dartVsLabel }}</span>
+            <button onClick="{{ endDartRound }}" style="background:none;border:none;cursor:pointer;font:600 12px 'Work Sans';color:#a13d2d">Runde beenden</button>
+          </div>
+
+          <sc-if value="{{ isX01 }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <sc-for list="{{ dartPlayers }}" as="p" hint-placeholder-count="2">
+              <div style="background:{{ p.bg }};border:2px solid {{ p.border }};border-radius:18px;padding:14px 12px;text-align:center">
+                <div style="font:600 13px 'Work Sans';color:{{ p.nameColor }}">{{ p.name }}</div>
+                <div style="font:700 46px 'Oswald';color:{{ p.scoreColor }};line-height:1;margin:4px 0">{{ p.score }}</div>
+                <div style="font:500 11px 'Work Sans';color:#9a8a72;min-height:14px">{{ p.note }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="text-align:center;font:600 13px 'Work Sans';color:#7a6a54;margin:12px 0 8px">{{ dartTurnLabel }}</div>
+          <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:12px;text-align:center;margin-bottom:12px">
+            <div style="font:700 34px 'Oswald';color:#2b2016;min-height:38px;letter-spacing:1px">{{ dartInputShow }}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <sc-for list="{{ dartKeys }}" as="k" hint-placeholder-count="12">
+              <button onClick="{{ k.press }}" style="border:1px solid #e4d5b8;background:{{ k.bg }};color:{{ k.color }};font:600 20px 'Oswald';padding:13px 0;border-radius:13px;cursor:pointer">{{ k.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button onClick="{{ dartUndo }}" style="flex:1;border:1px solid #e4d5b8;background:#fff8ec;color:#7a6a54;font:600 14px 'Work Sans';padding:12px;border-radius:13px;cursor:pointer">↶ Zurück</button>
+            <button onClick="{{ dartReset }}" style="flex:1;border:1px solid #e4d5b8;background:#fff8ec;color:#a13d2d;font:600 14px 'Work Sans';padding:12px;border-radius:13px;cursor:pointer">Neues Spiel</button>
+          </div>
+          <sc-if value="{{ dartConfirmReset }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;background:#fbeae7;border:1px solid #e3a89c;border-radius:12px;padding:10px 12px;margin-top:10px">
+            <span style="flex:1;font:500 12px 'Work Sans';color:#8a3325">Spielstand wirklich zurücksetzen?</span>
+            <button onClick="{{ cancelDartReset }}" style="border:1px solid #e4d5b8;background:#fff;color:#5c4c38;font:600 12px 'Work Sans';padding:7px 11px;border-radius:9px;cursor:pointer">Abbrechen</button>
+            <button onClick="{{ confirmDartReset }}" style="border:none;background:#a13d2d;color:#fff;font:600 12px 'Work Sans';padding:7px 11px;border-radius:9px;cursor:pointer">Ja</button>
+          </div>
+          </sc-if>
+          </sc-if>
+        </div>
+
+        <!-- cricket mode -->
+        <sc-if value="{{ isCricket }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:14px 16px 0">
+          <div style="display:flex;justify-content:space-between;background:#1f1f24;border-radius:14px;padding:12px 10px;color:#f3e8d2;margin-bottom:12px;overflow-x:auto;gap:6px">
+            <sc-for list="{{ cricketPlayers }}" as="p" hint-placeholder-count="2">
+              <div style="text-align:center;flex:1;min-width:60px">
+                <div style="width:26px;height:26px;border-radius:50%;background:{{ p.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 11px 'Oswald';margin:0 auto 3px">{{ p.initials }}</div>
+                <div style="font:600 11px 'Work Sans';color:#c9c9d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
+                <div style="font:700 22px 'Oswald'">{{ p.points }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <sc-for list="{{ cricketRows }}" as="r" hint-placeholder-count="7">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <div style="width:34px;text-align:center;font:700 16px 'Oswald';color:#2b2016;flex:none">{{ r.label }}</div>
+              <div style="flex:1;display:flex;gap:6px;overflow-x:auto">
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="2">
+                  <button onClick="{{ c.tap }}" style="flex:1;min-width:56px;display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid {{ c.border }};background:{{ c.bg }};border-radius:10px;padding:7px 4px;cursor:pointer">
+                    <div style="display:flex;gap:2px">
+                      <sc-for list="{{ c.ticks }}" as="tk" hint-placeholder-count="3">
+                        <span style="width:6px;height:16px;border-radius:2px;background:{{ tk.color }};opacity:{{ tk.filled }}"></span>
+                      </sc-for>
+                    </div>
+                    <span style="font:600 9px 'Work Sans';color:#7a6a54">{{ c.initials }}{{ c.overflow }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <button onClick="{{ dartReset }}" style="width:100%;margin-top:10px;border:1px solid #e4d5b8;background:#fff8ec;color:#a13d2d;font:600 14px 'Work Sans';padding:12px;border-radius:13px;cursor:pointer">Neues Spiel</button>
+          <sc-if value="{{ dartConfirmReset }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;background:#fbeae7;border:1px solid #e3a89c;border-radius:12px;padding:10px 12px;margin-top:10px">
+            <span style="flex:1;font:500 12px 'Work Sans';color:#8a3325">Spielstand wirklich zurücksetzen?</span>
+            <button onClick="{{ cancelDartReset }}" style="border:1px solid #e4d5b8;background:#fff;color:#5c4c38;font:600 12px 'Work Sans';padding:7px 11px;border-radius:9px;cursor:pointer">Abbrechen</button>
+            <button onClick="{{ confirmDartReset }}" style="border:none;background:#a13d2d;color:#fff;font:600 12px 'Work Sans';padding:7px 11px;border-radius:9px;cursor:pointer">Ja</button>
+          </div>
+          </sc-if>
+          <div style="font:500 11px 'Work Sans';color:#9a8a72;text-align:center;margin-top:8px;line-height:1.4">Tippen = Treffer. Drei Striche = Zahl zu (grün). Ist deine Zahl zu und die eines Gegners noch offen, gibt jeder weitere Treffer Punkte.</div>
+        </div>
+        </sc-if>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ============ STATISTIK ============ -->
+      <sc-if value="{{ isStats }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slidein .25s ease;padding-bottom:20px">
+        <div style="padding:18px 20px 16px;background:#1a3a2a;color:#f3e8d2">
+          <div style="font:600 10px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#9ecab0">Statistik</div>
+          <div style="font:600 22px 'Oswald';margin-top:2px">🍺 Wie viel hast du getrunken?</div>
+        </div>
+        <div style="padding:16px">
+          <div style="display:flex;gap:8px;margin-bottom:14px">
+            <sc-for list="{{ statsTabs }}" as="t" hint-placeholder-count="2">
+              <button onClick="{{ t.select }}" style="flex:1;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.color }};font:600 13px 'Work Sans';padding:11px 4px;border-radius:11px;cursor:pointer">{{ t.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:16px">
+            <sc-for list="{{ statsPeriods }}" as="p" hint-placeholder-count="3">
+              <button onClick="{{ p.select }}" style="flex:1;border:1px solid {{ p.border }};background:{{ p.bg }};color:{{ p.color }};font:600 12px 'Work Sans';padding:10px 4px;border-radius:11px;cursor:pointer">{{ p.label }}</button>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ statsViewIsMe }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:10px;margin-bottom:16px">
+            <div style="flex:1;background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:16px 14px;text-align:center">
+              <div style="font:700 30px 'Oswald';color:#7a3b12">{{ statsCount }}</div>
+              <div style="font:500 11px 'Work Sans';color:#8a7860;margin-top:2px">Getränke {{ statsPeriodLabel }}</div>
+            </div>
+            <div style="flex:1;background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:16px 14px;text-align:center">
+              <div style="font:700 30px 'Oswald';color:#7a3b12">{{ statsCost }}</div>
+              <div style="font:500 11px 'Work Sans';color:#8a7860;margin-top:2px">Ausgegeben {{ statsPeriodLabel }}</div>
+            </div>
+          </div>
+
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:6px 4px 10px">Aufschlüsselung</div>
+          <sc-if value="{{ statsHasData }}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{ statsBreakdown }}" as="d" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:11px;background:#fff8ec;border:1px solid #e4d5b8;border-radius:14px;padding:10px 13px;margin-bottom:8px">
+              <div style="flex:1;font:600 14px 'Work Sans';color:#2b2016">{{ d.label }}</div>
+              <div style="font:600 13px 'Work Sans';color:#8a7860">{{ d.count }}×</div>
+              <div style="font:700 15px 'Oswald';color:#7a3b12;min-width:64px;text-align:right">{{ d.cost }}</div>
+            </div>
+          </sc-for>
+          </sc-if>
+          <sc-if value="{{ statsNoData }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff8ec;border:1px dashed #e4d5b8;border-radius:16px;padding:20px;text-align:center;font:500 14px 'Work Sans';color:#8a7860">Für diesen Zeitraum noch keine Daten.</div>
+          </sc-if>
+
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:20px 4px 10px">Letzte Stammtische</div>
+          <sc-for list="{{ statsSessions }}" as="s" hint-placeholder-count="4">
+            <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:14px;margin-bottom:8px;overflow:hidden">
+              <button onClick="{{ s.toggle }}" style="width:100%;display:flex;align-items:center;gap:11px;background:none;border:none;padding:10px 13px;cursor:pointer;text-align:left">
+                <div style="font:600 13px 'Work Sans';color:#5c4c38;width:78px;flex:none">{{ s.dateLabel }}</div>
+                <div style="flex:1;font:500 12px 'Work Sans';color:#8a7860">{{ s.countLabel }}</div>
+                <div style="font:700 14px 'Oswald';color:#7a3b12">{{ s.cost }}</div>
+                <div style="font:600 12px 'Work Sans';color:#b0997a;flex:none">{{ s.chevron }}</div>
+              </button>
+              <sc-if value="{{ s.isOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 13px 12px;display:flex;flex-direction:column;gap:5px">
+                <sc-for list="{{ s.items }}" as="it" hint-placeholder-count="2">
+                  <div style="display:flex;justify-content:space-between;font:500 12px 'Work Sans';color:#5c4c38;background:#f3e8d2;border-radius:8px;padding:5px 9px">
+                    <span>{{ it.label }}</span>
+                    <span style="font-weight:600">{{ it.count }}×</span>
+                  </div>
+                </sc-for>
+              </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          </sc-if>
+
+          <sc-if value="{{ statsViewIsBoard }}" hint-placeholder-val="{{ false }}">
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:6px 4px 10px">Bier-Rangliste {{ statsPeriodLabel }}</div>
+          <sc-if value="{{ hasLeaderboard }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ leaderboard }}" as="r" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:11px;background:{{ r.rowBg }};border:1px solid {{ r.rowBorder }};border-radius:14px;padding:10px 13px;margin-bottom:8px">
+              <div style="font:700 15px 'Oswald';color:#b0997a;width:20px">{{ r.rank }}</div>
+              <div style="width:32px;height:32px;border-radius:50%;background:{{ r.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Oswald'">{{ r.initials }}</div>
+              <div style="flex:1;font:600 14px 'Work Sans';color:#2b2016">{{ r.name }}</div>
+              <div style="font:600 13px 'Work Sans';color:#8a7860">{{ r.count }}×</div>
+              <div style="font:700 14px 'Oswald';color:#7a3b12;min-width:64px;text-align:right">{{ r.cost }}</div>
+            </div>
+          </sc-for>
+          </sc-if>
+          <sc-if value="{{ leaderboardEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff8ec;border:1px dashed #e4d5b8;border-radius:16px;padding:20px;text-align:center;font:500 14px 'Work Sans';color:#8a7860">Für diesen Zeitraum noch keine Daten.</div>
+          </sc-if>
+
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:22px 4px 10px">Anwesenheit {{ statsPeriodLabel }}</div>
+          <sc-if value="{{ hasAttendanceBoard }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ attendanceBoard }}" as="r" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:11px;background:{{ r.rowBg }};border:1px solid {{ r.rowBorder }};border-radius:14px;padding:10px 13px;margin-bottom:8px">
+              <div style="font:700 15px 'Oswald';color:#b0997a;width:20px">{{ r.rank }}</div>
+              <div style="width:32px;height:32px;border-radius:50%;background:{{ r.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Oswald'">{{ r.initials }}</div>
+              <div style="flex:1;font:600 14px 'Work Sans';color:#2b2016">{{ r.name }}</div>
+              <div style="font:600 13px 'Work Sans';color:#8a7860">{{ r.countLabel }}</div>
+            </div>
+          </sc-for>
+          </sc-if>
+          <sc-if value="{{ attendanceBoardEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff8ec;border:1px dashed #e4d5b8;border-radius:16px;padding:20px;text-align:center;font:500 14px 'Work Sans';color:#8a7860">Für diesen Zeitraum noch keine Daten.</div>
+          </sc-if>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+
+    <!-- ============ BOTTOM NAV ============ -->
+    <sc-if value="{{ hasUser }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:none;display:flex;background:#fff8ec;border-top:1px solid #e4d5b8;padding:8px 6px calc(8px + env(safe-area-inset-bottom))">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
+        <button onClick="{{ n.go }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0">
+          <span style="font-size:21px;filter:{{ n.filter }};transition:.2s">{{ n.icon }}</span>
+          <span style="font:600 10px 'Work Sans';color:{{ n.color }}">{{ n.label }}</span>
+        </button>
+      </sc-for>
+    </div>
+    </sc-if>
+
+  </div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:880}}">
+class Component extends DCLogic {
+  members = [
+    { id:'carsten', name:'Carsten', color:'#2f5d3f', dogIcon:'🐕' },
+    { id:'christian', name:'Christian', color:'#7a3b12', dogIcon:'🐩' },
+    { id:'danny', name:'Danny', color:'#8a6d1e', dogIcon:'🐶' },
+    { id:'felix', name:'Felix', color:'#a13d2d', dogIcon:'🦮' },
+    { id:'flo', name:'Flo', color:'#3a5a80', dogIcon:'🐕‍🦺' },
+    { id:'martin', name:'Martin', color:'#6b4a7a', dogIcon:'🐕' },
+    { id:'roman', name:'Roman', color:'#2f5d3f', dogIcon:'🐩' },
+    { id:'sebastian', name:'Sebastian', color:'#7a3b12', dogIcon:'🐶' },
+    { id:'sven', name:'Sven', color:'#8a6d1e', dogIcon:'🦮' },
+    { id:'thorbjoern', name:'Thorbjörn', color:'#a13d2d', dogIcon:'🐕‍🦺' },
+  ];
+  drinksList = [
+    { id:'kh', label:'Kleines Helles (Erdinger)', price:3.80, beer:true },
+    { id:'gh', label:'Großes Helles (Erdinger)', price:5.50, beer:true },
+    { id:'pu3', label:'Pilsner Urquell 0,3', price:3.80, beer:true },
+    { id:'pu5', label:'Pilsner Urquell 0,5', price:5.50, beer:true },
+    { id:'zw3', label:'Ratsherrn Zwickel 0,3', price:4.00, beer:true },
+    { id:'zw5', label:'Ratsherrn Zwickel 0,5', price:5.80, beer:true },
+    { id:'wz', label:'Weizen (Erdinger Hell)', price:5.50, beer:true },
+    { id:'gu', label:'Guinness 0,4', price:5.50, beer:true },
+    { id:'pe', label:'Peroni', price:3.80, beer:true },
+    { id:'af', label:'Alkoholfrei (Erdinger)', price:5.50 },
+    { id:'ta', label:'Tarifa', price:3.00 },
+  ];
+  // Beispiel-Historie vergangener Stammtische (Platzhalter, bis das Google Sheet angebunden ist)
+  drinkHistory = (() => {
+    const dates = ['2025-08-06','2025-09-03','2025-10-01','2025-11-05','2025-12-03','2026-01-07','2026-02-04','2026-03-04','2026-04-01','2026-05-06','2026-06-03'];
+    const ids = ['carsten','christian','danny','felix','flo','martin','roman','sebastian','sven','thorbjoern'];
+    const drinkIds = ['kh','gh','pu3','pu5','zw3','zw5','wz','gu','pe','af'];
+    const out = [];
+    dates.forEach((date,di) => { ids.forEach((mid,ii) => {
+      if ((di+ii) % 3 === 0) return;
+      const items = {}; const primary = drinkIds[(di+ii) % drinkIds.length];
+      items[primary] = 1 + ((di+ii) % 3);
+      if ((di+ii) % 4 === 0) items[drinkIds[(di+ii+2) % drinkIds.length]] = 1;
+      out.push({ date, mid, items });
+    }); });
+    return out;
+  })();
+
+  // Beispiel-Anwesenheitshistorie (Platzhalter, bis das Google Sheet angebunden ist)
+  attendanceHistory = (() => {
+    const dates = ['2025-08-06','2025-09-03','2025-10-01','2025-11-05','2025-12-03','2026-01-07','2026-02-04','2026-03-04','2026-04-01','2026-05-06','2026-06-03'];
+    const ids = ['carsten','christian','danny','felix','flo','martin','roman','sebastian','sven','thorbjoern'];
+    const out = [];
+    dates.forEach((date,di) => { ids.forEach((mid,ii) => {
+      if ((di+ii) % 3 === 0) return; // gleiche Teilnahme-Logik wie bei der Getraenke-Historie
+      out.push({ date, mid });
+    }); });
+    return out;
+  })();
+
+  state = {
+    screen:'home',
+    currentUser:this.readUserCookie(),
+    sheetUrl:(typeof localStorage!=='undefined' && localStorage.getItem('stammtisch_sheet_url'))||'',
+    sheetUrlDraft:'',
+    sheetStatus:'idle',
+    remoteHistory:null,
+    attendance:{ danny:'yes', roman:'yes', flo:'yes', christian:'no', sven:'yes' },
+    drinks:{},
+    payerIndex:2,
+    rounds:[
+      { id:1, mid:'christian', reason:'Hat beim Dart verloren', paid:false },
+      { id:2, mid:'christian', reason:'Geburtstag', paid:false },
+      { id:3, mid:'flo', reason:'Wette verloren', paid:false },
+    ],
+    addMid:null,
+    addReason:null,
+    dartMode:'501',
+    dartScores:{ carsten:501, christian:501 },
+    dartCurrentIdx:0,
+    dartInput:'',
+    dartNotes:{},
+    dartWinner:null,
+    dartHistory:[],
+    cricketMarks:{ carsten:{}, christian:{} },
+    cricketPoints:{ carsten:0, christian:0 },
+    dartPlayerIds:['carsten','christian'],
+    dartPickerOpen:false,
+    dartStarted:false,
+    dartConfirmReset:false,
+    statsPeriod:'month',
+    statsView:'me',
+    openSessionKey:null,
+    customDrinks:{},
+    finishMsg:'',
+  };
+
+  clock = '19:04';
+
+  readUserCookie(){
+    let m = null;
+    try { m = document.cookie.match(/(?:^|; )stammtisch_user=([^;]+)/); } catch(e){}
+    const id = m ? decodeURIComponent(m[1]) : null;
+    return this.members.some(mem=>mem.id===id) ? id : null;
+  }
+  selectUser(id){
+    try { document.cookie = 'stammtisch_user='+encodeURIComponent(id)+';max-age=31536000;path=/'; } catch(e){}
+    this.setState({ currentUser:id });
+    this.fetchSheetHistory();
+  }
+  logout(){
+    try { document.cookie = 'stammtisch_user=;max-age=0;path=/'; } catch(e){}
+    this.setState({ currentUser:null });
+  }
+
+  // ---- Google Sheet Anbindung (Apps-Script-Web-App als API) ----
+  setSheetUrlDraft(v){ this.setState({ sheetUrlDraft:v }); }
+  saveSheetUrl(){
+    const url = this.state.sheetUrlDraft.trim();
+    if(!url) return;
+    if(typeof localStorage!=='undefined') localStorage.setItem('stammtisch_sheet_url', url);
+    this.setState({ sheetUrl:url, sheetUrlDraft:'' });
+    this.fetchSheetHistory();
+  }
+  disconnectSheet(){
+    if(typeof localStorage!=='undefined') localStorage.removeItem('stammtisch_sheet_url');
+    this.setState({ sheetUrl:'', remoteHistory:null, sheetStatus:'idle' });
+  }
+  fetchSheetHistory(){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    this.setState({ sheetStatus:'loading' });
+    fetch(url+'?action=history')
+      .then(r=>r.json())
+      .then(data=>this.setState({ remoteHistory: Array.isArray(data.history)?data.history:[], sheetStatus:'ok' }))
+      .catch(()=>this.setState({ sheetStatus:'error' }));
+  }
+  pushDrinkToSheet(mid, did, delta, dateStr){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({ action:'logDrink', mid, did, delta, date:dateStr }),
+    }).then(()=>this.fetchSheetHistory()).catch(()=>{});
+  }
+
+  go(screen){ return () => { this.setState({ screen }); if(screen==='stats' && this.state.sheetUrl) this.fetchSheetHistory(); }; }
+
+  // ---- next Stammtisch: first Wednesday not in the past ----
+  nextStammtisch(){
+    const t = new Date(2026,6,21);
+    const fw = (y,m)=>{ const d=new Date(y,m,1); return new Date(y,m,1+((3-d.getDay()+7)%7)); };
+    let d = fw(t.getFullYear(), t.getMonth());
+    if (d < t) d = fw(t.getFullYear(), t.getMonth()+1);
+    return d;
+  }
+
+  initials(name){ return name.slice(0,2).toUpperCase(); }
+
+  setAttend(id,val){ this.setState(s=>({ attendance:{...s.attendance, [id]: s.attendance[id]===val?null:val } })); }
+  addDrink(mid,did,delta){ this.setState(s=>{ const dr={...s.drinks}; const md={...(dr[mid]||{})}; md[did]=Math.max(0,(md[did]||0)+delta); dr[mid]=md; return {drinks:dr}; }); const cd=this.state.customDrinks[mid]; const d=did==='custom'?{label:(cd&&cd.name)||'Weitere'}:this.drinksList.find(x=>x.id===did); this.pushDrinkToSheet(mid,d?d.label:did,delta,new Date().toISOString().slice(0,10)); }
+  setCustomName(mid,name){ this.setState(s=>({ customDrinks:{...s.customDrinks, [mid]:{...(s.customDrinks[mid]||{name:'',price:0}), name} } })); }
+  setCustomPrice(mid,price){ this.setState(s=>({ customDrinks:{...s.customDrinks, [mid]:{...(s.customDrinks[mid]||{name:'',price:0}), price:parseFloat(price)||0} } })); }
+  payNext(){ this.setState(s=>({ payerIndex:(s.payerIndex+1)%this.members.length })); }
+  setPayer(idx){ this.setState({ payerIndex:idx }); }
+  removeRound(id){ this.setState(s=>({ rounds:s.rounds.filter(r=>r.id!==id) })); }
+  setAddMid(mid){ this.setState(s=>({ addMid:s.addMid===mid?null:mid })); }
+  setAddReason(r){ this.setState(s=>({ addReason:s.addReason===r?null:r })); }
+  setAddReasonDraft(v){ this.setState({ addReason:v }); }
+  setAddWhen(w){}
+  addRound(){ const s=this.state; if(!s.addMid||!s.addReason||!s.addReason.trim()) return; this.setState(st=>({ rounds:[...st.rounds,{id:Date.now(),mid:st.addMid,reason:st.addReason.trim(),paid:false}], addMid:null, addReason:null })); }
+  markRoundPaid(id){ this.setState(s=>({ rounds:s.rounds.map(r=>r.id===id?{...r,paid:true}:r) })); }
+  markRoundUnpaid(id){ this.setState(s=>({ rounds:s.rounds.map(r=>r.id===id?{...r,paid:false}:r) })); }
+
+  // ---- dart x01 & cricket, beliebig viele Spieler ----
+  dartPress(k){
+    if(this.state.dartWinner!==null) return;
+    if(k==='C'){ this.setState({dartInput:''}); return; }
+    if(k==='OK'){ this.dartSubmit(); return; }
+    this.setState(s=>{ if(s.dartInput.length>=3) return {}; const n=s.dartInput+k; if(parseInt(n)>180) return {dartInput:'180'}; return {dartInput:n}; });
+  }
+  dartSubmit(){
+    this.setState(s=>{
+      if(s.dartInput==='') return {};
+      const pts=parseInt(s.dartInput);
+      const ids=s.dartPlayerIds;
+      const cur=ids[s.dartCurrentIdx];
+      const scores={...s.dartScores};
+      const notes={}; ids.forEach(id=>notes[id]='');
+      const rem=scores[cur]-pts;
+      const hist=[...s.dartHistory,{idx:s.dartCurrentIdx,mid:cur,prev:scores[cur]}];
+      const nextIdx=(s.dartCurrentIdx+1)%ids.length;
+      if(rem<0||rem===1){ notes[cur]='Überworfen! ('+pts+')'; return {dartInput:'',dartCurrentIdx:nextIdx,dartNotes:notes,dartHistory:hist}; }
+      if(rem===0){ scores[cur]=0; notes[cur]='🏆 Gewonnen!'; return {dartScores:scores,dartInput:'',dartNotes:notes,dartWinner:cur,dartHistory:hist}; }
+      scores[cur]=rem; notes[cur]='−'+pts;
+      return {dartScores:scores,dartInput:'',dartCurrentIdx:nextIdx,dartNotes:notes,dartHistory:hist};
+    });
+  }
+  dartUndo(){
+    this.setState(s=>{ if(!s.dartHistory.length) return {}; const h=[...s.dartHistory]; const last=h.pop(); const scores={...s.dartScores}; scores[last.mid]=last.prev; return {dartScores:scores,dartCurrentIdx:last.idx,dartHistory:h,dartWinner:null,dartInput:'',dartNotes:{}}; });
+  }
+  setDartMode(mode){
+    const ids=this.state.dartPlayerIds;
+    if(mode==='cricket'){ this.setState({dartMode:'cricket',cricketMarks:Object.fromEntries(ids.map(id=>[id,{}])),cricketPoints:Object.fromEntries(ids.map(id=>[id,0]))}); return; }
+    const start=mode==='301'?301:501;
+    this.setState({dartMode:mode,dartScores:Object.fromEntries(ids.map(id=>[id,start])),dartCurrentIdx:0,dartInput:'',dartNotes:{},dartWinner:null,dartHistory:[]});
+  }
+  dartReset(){ this.setDartMode(this.state.dartMode); }
+  requestDartReset(){ this.setState({ dartConfirmReset:true }); }
+  confirmDartReset(){ this.dartReset(); this.setState({ dartConfirmReset:false }); }
+  cancelDartReset(){ this.setState({ dartConfirmReset:false }); }
+  startDartRound(){ this.setDartMode(this.state.dartMode); this.setState({ dartStarted:true }); }
+  endDartRound(){ this.setState({ dartStarted:false }); }
+  toggleDartPlayer(mid){
+    this.setState(s=>{
+      const has=s.dartPlayerIds.includes(mid);
+      let ids;
+      if(has){ if(s.dartPlayerIds.length<=2) return {}; ids=s.dartPlayerIds.filter(id=>id!==mid); }
+      else { if(s.dartPlayerIds.length>=6) return {}; ids=[...s.dartPlayerIds, mid]; }
+      if(s.dartMode==='cricket'){
+        return { dartPlayerIds:ids, cricketMarks:Object.fromEntries(ids.map(id=>[id,{}])), cricketPoints:Object.fromEntries(ids.map(id=>[id,0])) };
+      }
+      const start=s.dartMode==='301'?301:501;
+      return { dartPlayerIds:ids, dartScores:Object.fromEntries(ids.map(id=>[id,start])), dartCurrentIdx:0, dartInput:'', dartNotes:{}, dartWinner:null, dartHistory:[] };
+    });
+  }
+
+  cricketTap(mid,num,val){
+    this.setState(s=>{
+      const marks={}; s.dartPlayerIds.forEach(id=>marks[id]={...(s.cricketMarks[id]||{})});
+      const pts={...s.cricketPoints};
+      const cur=marks[mid][num]||0;
+      if(cur>=3){ s.dartPlayerIds.forEach(id=>{ if(id===mid) return; const opp=marks[id][num]||0; if(opp<3) pts[mid]=(pts[mid]||0)+val; }); }
+      marks[mid][num]=cur+1;
+      return {cricketMarks:marks,cricketPoints:pts};
+    });
+  }
+
+  setStatsPeriod(p){ this.setState({ statsPeriod:p }); }
+  setStatsView(v){ this.setState({ statsView:v }); }
+  toggleSession(key){ this.setState(s=>({ openSessionKey: s.openSessionKey===key?null:key })); }
+  toggleDartPicker(){ this.setState(s=>({ dartPickerOpen:!s.dartPickerOpen })); }
+
+  // Schliesst den heutigen Stammtisch ab: eigene Strichliste + Anwesenheit werden fest
+  // in die Historie uebernommen (Grundlage fuer Statistik & Rangliste), danach Reset fuer's naechste Mal.
+  finishStammtisch(){
+    const s=this.state;
+    const today = new Date().toISOString().slice(0,10);
+    const me=s.currentUser;
+    const items = s.drinks[me]||{};
+    if(Object.values(items).some(v=>v>0)){
+      this.drinkHistory = [...this.drinkHistory.filter(e=>!(e.date===today&&e.mid===me)), {date:today,mid:me,items}];
+    }
+    Object.keys(s.attendance).forEach(mid=>{
+      if(s.attendance[mid]==='yes'){
+        this.attendanceHistory = [...this.attendanceHistory.filter(e=>!(e.date===today&&e.mid===mid)), {date:today,mid}];
+      }
+    });
+    this.setState(st=>{ const dr={...st.drinks}; delete dr[me]; return { drinks:dr, finishMsg:'Stammtisch abgeschlossen – deine Strichliste ist jetzt in der Statistik.' }; });
+  }
+
+  componentDidMount(){
+    if(this.state.sheetUrl) this.fetchSheetHistory();
+  }
+
+  renderVals(){
+    const s=this.state, M=this.members;
+    if(!s.currentUser){
+      const pickerMembers = [...M].sort((a,b)=>a.name.localeCompare(b.name,'de')).map(m=>({
+        id:m.id,name:m.name,color:m.color,initials:this.initials(m.name),dogIcon:m.dogIcon,pick:()=>this.selectUser(m.id),
+      }));
+      return { isPicker:true, hasUser:false, clock:this.clock, pickerMembers,
+        isHome:false,isTermin:false,isGetraenke:false,isRunde:false,isDart:false,isStats:false,isInfo:false };
+    }
+    const att=s.attendance;
+    const isYes=id=>att[id]==='yes', isNo=id=>att[id]==='no';
+    const nsd=this.nextStammtisch();
+    const wd=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    const mo=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    const nextDateLong = wd[nsd.getDay()]+', '+nsd.getDate()+'. '+mo[nsd.getMonth()];
+    const nextDateShort = nsd.getDate()+'. '+mo[nsd.getMonth()].slice(0,3)+'.';
+
+    const yesCount=M.filter(m=>isYes(m.id)).length;
+    const noCount=M.filter(m=>isNo(m.id)).length;
+    const maybeCount=M.length-yesCount-noCount;
+
+    // dashboard tiles
+    const tiles=[
+      {icon:'🗓️',title:'Teilnahme',sub:'Zu- & Absagen',bg:'#eaf1ec',go:this.go('termin')},
+      {icon:'🍺',title:'Getränke',sub:'Strichliste',bg:'#f6ece0',go:this.go('getraenke')},
+      {icon:'💶',title:'Wer zahlt?',sub:'Nächste Runde',bg:'#f7f0da',go:this.go('runde')},
+      {icon:'🎯',title:'Dart',sub:'501 & Cricket',bg:'#eceaf0',go:this.go('dart')},
+      {icon:'📊',title:'Statistik',sub:'Bier & Ausgaben',bg:'#eaf1ec',go:this.go('stats')},
+    ];
+
+    // ---- current user ("Du") ----
+    const eur=n=>n.toFixed(2).replace('.',',')+' €';
+    const me=M.find(m=>m.id===s.currentUser);
+    const meY=isYes(me.id), meN=isNo(me.id);
+    const meVals={
+      meName:me.name,meColor:me.color,meInitials:this.initials(me.name),meDogIcon:me.dogIcon,
+      meSetYes:()=>this.setAttend(me.id,'yes'),meSetNo:()=>this.setAttend(me.id,'no'),
+      meYesBg:meY?'#2f5d3f':'#fff',meYesBorder:meY?'#2f5d3f':'#cdbf9f',meYesColor:meY?'#fff':'#7a6a54',
+      meNoBg:meN?'#a13d2d':'#fff',meNoBorder:meN?'#a13d2d':'#cdbf9f',meNoColor:meN?'#fff':'#7a6a54',
+    };
+    const statusMeta=id=> isYes(id)?{statusLabel:'Dabei',statusColor:'#2f5d3f',statusBg:'#e6f0e9'}
+      : isNo(id)?{statusLabel:'Abgesagt',statusColor:'#a13d2d',statusBg:'#f7e7e4'}
+      : {statusLabel:'Offen',statusColor:'#8a6d1e',statusBg:'#f5edd6'};
+    const othersRows=M.filter(m=>m.id!==me.id).map(m=>({
+      name:m.name,color:m.color,initials:this.initials(m.name),dogIcon:m.dogIcon,...statusMeta(m.id)
+    }));
+
+    // drinks (nur eigene Strichliste)
+    const md=s.drinks[me.id]||{};
+    const meDrinks=this.drinksList.map(d=>{ const c=md[d.id]||0; return {
+      label:d.label,count:c,priceLabel:eur(d.price),lineLabel:eur(c*d.price),rowBg:c>0?'#fdf6e6':'#fff8ec',
+      inc:()=>this.addDrink(me.id,d.id,1),dec:()=>this.addDrink(me.id,d.id,-1)
+    };});
+    const customDef = s.customDrinks[me.id] || {name:'',price:0};
+    const customCount = md['custom']||0;
+    const customPriceNum = customDef.price||0;
+    const meDrinkTotal=meDrinks.reduce((a,b)=>a+b.count,0)+customCount;
+    const meCost=eur(this.drinksList.reduce((a,d)=>a+(md[d.id]||0)*d.price,0) + customPriceNum*customCount);
+
+    // Runden (mehrere möglich, mit Grund) – offen und bezahlt getrennt, Zeitpunkt spielt keine Rolle
+    const memById=id=>M.find(m=>m.id===id);
+    const roundView=r=>{ const m=memById(r.mid); return {id:r.id,name:m.name,initials:this.initials(m.name),color:m.color,reason:r.reason,
+      markPaid:()=>this.markRoundPaid(r.id),markUnpaid:()=>this.markRoundUnpaid(r.id),remove:()=>this.removeRound(r.id)}; };
+    const openRounds=s.rounds.filter(r=>!r.paid).map(roundView);
+    const paidRounds=s.rounds.filter(r=>r.paid).map(roundView);
+    const queue=openRounds;
+    const up=queue[0]||null;
+    const roundReasons=['Hat beim Dart verloren','Wette verloren','Geburtstag','Zu spät gekommen','Neuer Hund im Rudel','Einfach so'];
+    const debt={}; s.rounds.filter(r=>!r.paid).forEach(r=>debt[r.mid]=(debt[r.mid]||0)+1);
+    const debtRows=Object.keys(debt).map(id=>{ const m=memById(id); return {name:m.name,initials:this.initials(m.name),color:m.color,countLabel:debt[id]+(debt[id]===1?' Runde':' Runden'),count:debt[id]}; }).sort((a,b)=>b.count-a.count);
+    const addMembers=M.map(m=>({name:m.name,initials:this.initials(m.name),color:m.color,dogIcon:m.dogIcon,sel:s.addMid===m.id,
+      ring:s.addMid===m.id?'#8a6d1e':'transparent',op:s.addMid===m.id?'1':'.55',select:()=>this.setAddMid(m.id)}));
+    const addReasonDraft = s.addReason||'';
+
+    // dart tabs
+    const dt=(m,l)=>({label:l,go:()=>this.setDartMode(m),bg:s.dartMode===m?'#c07f2a':'transparent',color:s.dartMode===m?'#fff':'#9a9aa8'});
+    const dartTabs=[dt('501','501'),dt('301','301'),dt('cricket','Cricket')];
+    const isX01=s.dartMode==='501'||s.dartMode==='301';
+    const memById2=id=>M.find(m=>m.id===id)||M[0];
+    const dartRoster=s.dartPlayerIds.map(memById2);
+    const dartVsLabel=dartRoster.map(m=>m.name).join(' vs ');
+    const dartPickerOptions=M.map(m=>({name:m.name,initials:this.initials(m.name),color:m.color,dogIcon:m.dogIcon,
+      sel:s.dartPlayerIds.includes(m.id),opacity:s.dartPlayerIds.includes(m.id)?'1':'.4',toggle:()=>this.toggleDartPlayer(m.id)}));
+
+    const dartPlayers=s.dartPlayerIds.map((mid,i)=>{ const active=i===s.dartCurrentIdx&&s.dartWinner===null; const won=s.dartWinner===mid; const pm=memById2(mid); return {
+      name:pm.name,score:s.dartScores[mid],note:s.dartNotes[mid]||'',
+      bg:won?'#eaf6ee':active?'#fff8ec':'#f6efe0',border:won?'#2f5d3f':active?'#c07f2a':'#e4d5b8',
+      nameColor:'#7a6a54',scoreColor:won?'#2f5d3f':'#2b2016',
+    };});
+    const dartTurnMid=s.dartPlayerIds[s.dartCurrentIdx];
+    const dartTurnLabel=s.dartWinner!==null?'Spiel vorbei — '+memById2(s.dartWinner).name+' gewinnt! 🏆':memById2(dartTurnMid).name+' ist dran — Wurf eingeben';
+    const keyLabels=['1','2','3','4','5','6','7','8','9','C','0','OK'];
+    const dartKeys=keyLabels.map(k=>({label:k==='OK'?'✓':k,press:()=>this.dartPress(k),
+      bg:k==='OK'?'#2f5d3f':k==='C'?'#f0e2c8':'#fff8ec',color:k==='OK'?'#fff':k==='C'?'#a13d2d':'#2b2016'}));
+
+    // cricket: Strichliste je Zahl x Spieler
+    const cnums=[{n:20,v:20,l:'20'},{n:19,v:19,l:'19'},{n:18,v:18,l:'18'},{n:17,v:17,l:'17'},{n:16,v:16,l:'16'},{n:15,v:15,l:'15'},{n:25,v:25,l:'Bull'}];
+    const cricketRows=cnums.map(cn=>({
+      label:cn.l,
+      cells:s.dartPlayerIds.map(mid=>{ const c=(s.cricketMarks[mid]||{})[cn.n]||0; const closed=c>=3;
+        const ticks=[0,1,2].map(i=>({filled:i<Math.min(c,3)?'1':'.18',color:closed?'#2f5d3f':'#c07f2a'}));
+        return { mid, initials:this.initials(memById2(mid).name), ticks, overflow:c>3?'+'+(c-3):'', closed, bg:closed?'#eaf6ee':'#fff8ec', border:closed?'#2f5d3f':'#e4d5b8',
+          tap:()=>this.cricketTap(mid,cn.n,cn.v) };
+      }),
+    }));
+    const cricketPlayers=s.dartPlayerIds.map(mid=>({name:memById2(mid).name,initials:this.initials(memById2(mid).name),color:memById2(mid).color,points:s.cricketPoints[mid]||0}));
+
+// Statistik: eigener Bier-/Getraenkekonsum
+    const eur2=n=>n.toFixed(2).replace('.',',')+' €';
+    const todayRef = this.nextStammtisch ? new Date(2026,6,21) : new Date();
+    const parseDate_=ds=>{ if(typeof ds==='string' && /^\d{4}-\d{2}-\d{2}/.test(ds)) return new Date(ds.slice(0,10)+'T00:00:00'); const d=new Date(ds); return isNaN(d.getTime())?new Date():d; };
+    const resolveDrink_=key=>this.drinksList.find(d=>d.id===key||d.label===key);
+    const normItems_=items=>{ const out={}; Object.entries(items||{}).forEach(([k,c])=>{ const d=resolveDrink_(k); const id=d?d.id:k; out[id]=(out[id]||0)+c; }); return out; };
+    const liveItems = s.drinks[me.id]||{};
+    const liveHasData = Object.values(liveItems).some(v=>v>0);
+    const allEntries = [...(s.remoteHistory||this.drinkHistory).filter(e=>e.mid===me.id), ...(liveHasData?[{date:todayRef.toISOString().slice(0,10),items:liveItems}]:[])]
+      .map(e=>({...e,items:normItems_(e.items)}));
+    const inPeriod = e=>{
+      const d=parseDate_(e.date);
+      if(s.statsPeriod==='month') return d.getFullYear()===todayRef.getFullYear() && d.getMonth()===todayRef.getMonth();
+      if(s.statsPeriod==='year') return d.getFullYear()===todayRef.getFullYear();
+      return true;
+    };
+    const periodEntries = allEntries.filter(inPeriod);
+    const byDrink={};
+    periodEntries.forEach(e=>{ Object.entries(e.items).forEach(([did,c])=>{ byDrink[did]=(byDrink[did]||0)+c; }); });
+    const statsBreakdown = Object.keys(byDrink).filter(id=>byDrink[id]>0).map(id=>{ const d=resolveDrink_(id); return {label:d?d.label:id, count:byDrink[id], cost:eur2(byDrink[id]*(d?d.price:0))}; });
+    const statsCountTotal = Object.values(byDrink).reduce((a,b)=>a+b,0);
+    const statsCostTotal = eur2(Object.keys(byDrink).reduce((a,id)=>{ const d=resolveDrink_(id); return a+byDrink[id]*(d?d.price:0); },0));
+    const periodMeta={month:'diesen Monat',year:'dieses Jahr',all:'insgesamt'};
+    const statsPeriods=[['month','Monat'],['year','Jahr'],['all','Gesamt']].map(([p,label])=>({label,select:()=>this.setStatsPeriod(p),
+      bg:s.statsPeriod===p?'#1a3a2a':'#fff8ec',color:s.statsPeriod===p?'#fff':'#5c4c38',border:s.statsPeriod===p?'#1a3a2a':'#e4d5b8'}));
+    const monNames=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    const statsSessions = [...allEntries].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6).map((e,i)=>{
+      const d=parseDate_(e.date); const cnt=Object.values(e.items).reduce((a,b)=>a+b,0);
+      const cost=Object.keys(e.items).reduce((a,id)=>{ const d=resolveDrink_(id); return a+e.items[id]*(d?d.price:0); },0);
+      const key=e.date+'|'+i; const isOpen=s.openSessionKey===key;
+      const items=Object.keys(e.items).filter(id=>e.items[id]>0).map(id=>{ const d=resolveDrink_(id); return {label:d?d.label:id, count:e.items[id]}; });
+      return {dateLabel:d.getDate()+'. '+monNames[d.getMonth()]+' '+d.getFullYear(),countLabel:cnt+' Getränke',cost:eur2(cost),
+        toggle:()=>this.toggleSession(key),isOpen,chevron:isOpen?'▲':'▼',items};
+    });
+
+    // Rangliste: nur Biere (Kleines/Großes Helles, Weizen), alle Mitglieder im gewaehlten Zeitraum
+    const beerIds = this.drinksList.filter(d=>d.beer).map(d=>d.id);
+    const remoteAll = (s.remoteHistory || this.drinkHistory).map(e=>({...e,items:normItems_(e.items)}));
+    const liveByMid = liveHasData ? { [me.id]: liveItems } : {};
+    const allDrinkEntries = [...remoteAll, ...Object.entries(liveByMid).map(([mid,items])=>({date:todayRef.toISOString().slice(0,10),mid,items:normItems_(items)}))];
+    const drinkPeriodEntries = allDrinkEntries.filter(inPeriod);
+    const totalsByMember = {};
+    drinkPeriodEntries.forEach(e=>{
+      const beerItems=Object.fromEntries(Object.entries(e.items).filter(([id])=>beerIds.includes(id)));
+      const cnt=Object.values(beerItems).reduce((a,b)=>a+b,0); const cost=this.drinksList.reduce((a,d)=>a+(beerItems[d.id]||0)*d.price,0);
+      if(!totalsByMember[e.mid]) totalsByMember[e.mid]={count:0,cost:0}; totalsByMember[e.mid].count+=cnt; totalsByMember[e.mid].cost+=cost;
+    });
+    const leaderboard = M.map(m=>({ m, count:(totalsByMember[m.id]||{count:0}).count, cost:(totalsByMember[m.id]||{cost:0}).cost }))
+      .filter(r=>r.count>0).sort((a,b)=>b.count-a.count)
+      .map((r,i)=>({ rank:i+1, name:r.m.name, initials:this.initials(r.m.name), color:r.m.color, count:r.count, cost:eur2(r.cost),
+        isMe:r.m.id===me.id, rowBg:r.m.id===me.id?'#fff3d0':'#fff8ec', rowBorder:r.m.id===me.id?'#e8c65f':'#e4d5b8' }));
+
+    // Anwesenheit: wie oft war wer im Zeitraum da (jeder geloggte Getraenke-Eintrag zaehlt automatisch als Anwesenheit)
+    const attDateSets_ = {};
+    const addAttDate_=(mid,date)=>{ if(!inPeriod({date})) return; (attDateSets_[mid]=attDateSets_[mid]||new Set()).add(date); };
+    this.attendanceHistory.forEach(e=>addAttDate_(e.mid,e.date));
+    (s.remoteHistory||this.drinkHistory).forEach(e=>addAttDate_(e.mid,e.date));
+    if(isYes(me.id)) addAttDate_(me.id, todayRef.toISOString().slice(0,10));
+    if(liveHasData) addAttDate_(me.id, todayRef.toISOString().slice(0,10));
+    const attCounts = {};
+    Object.keys(attDateSets_).forEach(mid=>{ attCounts[mid]=attDateSets_[mid].size; });
+    const attendanceBoard = M.map(m=>({ m, count:attCounts[m.id]||0 })).filter(r=>r.count>0).sort((a,b)=>b.count-a.count)
+      .map((r,i)=>({ rank:i+1, name:r.m.name, initials:this.initials(r.m.name), color:r.m.color, countLabel:r.count+(r.count===1?'× dabei':'× dabei'),
+        isMe:r.m.id===me.id, rowBg:r.m.id===me.id?'#fff3d0':'#fff8ec', rowBorder:r.m.id===me.id?'#e8c65f':'#e4d5b8' }));
+
+    const statsViewIsMe = s.statsView==='me';
+    const statsTabs=[['me','Meine Werte'],['board','Rangliste']].map(([v,label])=>({label,select:()=>this.setStatsView(v),
+      bg:s.statsView===v?'#1a3a2a':'#fff8ec',color:s.statsView===v?'#fff':'#5c4c38',border:s.statsView===v?'#1a3a2a':'#e4d5b8'}));
+
+    const fasanHours=[
+      {day:'Montag',time:'17:00–01:00',w:'400'},
+      {day:'Dienstag',time:'17:00–01:00',w:'400'},
+      {day:'Mittwoch',time:'17:00–01:00',w:'700'},
+      {day:'Donnerstag',time:'17:00–01:00',w:'400'},
+      {day:'Freitag',time:'17:00–02:00',w:'400'},
+      {day:'Samstag',time:'12:00–02:00',w:'400'},
+      {day:'Sonntag',time:'13:00–00:00',w:'400'},
+    ];
+    const fasanServices=['Reservierung erforderlich','Sitzplätze im Freien','Spiele','10–20 € pro Person'];
+
+    const nav=[['home','🏠','Home'],['termin','🗓️','Termin'],['getraenke','🍺','Getränke'],['dart','🎯','Dart'],['stats','📊','Statistik']];
+    const navItems=nav.map(([sc,ic,lb])=>{ const on=s.screen===sc; return {icon:ic,label:lb,go:this.go(sc),
+      color:on?'#2f5d3f':'#b0997a',filter:on?'none':'grayscale(1) opacity(.55)'};});
+
+    return {
+      isPicker:false, hasUser:true, pickerMembers:[],
+      clock:this.clock,
+      isHome:s.screen==='home',isTermin:s.screen==='termin',isGetraenke:s.screen==='getraenke',
+      isRunde:s.screen==='runde',isDart:s.screen==='dart',isStats:s.screen==='stats',isInfo:s.screen==='info',
+      goInfo:this.go('info'),goHome:this.go('home'),goRunde:this.go('runde'),logout:()=>this.logout(),
+      fasanHours,fasanServices,
+      sheetUrl:s.sheetUrl,sheetUrlDraft:s.sheetUrlDraft,setSheetUrlDraft:e=>this.setSheetUrlDraft(e.target.value),saveSheetUrl:()=>this.saveSheetUrl(),
+      disconnectSheet:()=>this.disconnectSheet(),sheetConnected:!!s.sheetUrl,sheetNotConnected:!s.sheetUrl,
+      sheetStatusLabel:s.sheetStatus==='loading'?'Lädt…':s.sheetStatus==='ok'?'Verbunden ✓':s.sheetStatus==='error'?'Verbindung fehlgeschlagen':'Nicht verbunden',
+      nextDateLong,nextDateShort,yesCount,noCount,maybeCount,
+      goTermin:this.go('termin'),tiles,
+      ...meVals,othersRows,
+      meDrinks,meDrinkTotal,meCost,finishStammtisch:()=>this.finishStammtisch(),finishMsg:s.finishMsg,hasFinishMsg:!!s.finishMsg,
+      customName:customDef.name,customPrice:customPriceNum,customCount,
+      customLineLabel:eur(customPriceNum*customCount),
+      setCustomName:e=>this.setCustomName(me.id,e.target.value),setCustomPrice:e=>this.setCustomPrice(me.id,e.target.value),
+      customInc:()=>this.addDrink(me.id,'custom',1),customDec:()=>this.addDrink(me.id,'custom',-1),
+      customRowBg:customCount>0?'#fdf6e6':'#fff8ec',
+      hasUp:!!up, noUp:!up, upName:up?up.name:'', upInitials:up?up.initials:'', upColor:up?up.color:'#8a6d1e',
+      upReason:up?up.reason:'', upPay:()=>{ if(up) this.markRoundPaid(up.id); },
+      hasMoreRounds:queue.length>1, moreRoundsCount:Math.max(0,queue.length-1),
+      openRounds,hasOpenRounds:openRounds.length>0,noOpenRounds:openRounds.length===0,paidRounds,hasPaidRounds:paidRounds.length>0,
+      debtRows,hasDebt:debtRows.length>0,
+      addMembers,addReasonDraft,setAddReasonDraft:e=>this.setAddReasonDraft(e.target.value),
+      canAdd:!!(s.addMid&&s.addReason&&s.addReason.trim()),addRound:()=>this.addRound(),
+      addDisabled:!(s.addMid&&s.addReason&&s.addReason.trim()),addOpacity:(s.addMid&&s.addReason&&s.addReason.trim())?'1':'.5',
+      dartTabs,isX01,isCricket:s.dartMode==='cricket',dartPlayers,dartTurnLabel,
+      dartInputShow:s.dartInput===''?'–':s.dartInput,dartKeys,dartUndo:()=>this.dartUndo(),dartReset:()=>this.requestDartReset(),
+      dartConfirmReset:s.dartConfirmReset,confirmDartReset:()=>this.confirmDartReset(),cancelDartReset:()=>this.cancelDartReset(),
+      cricketRows,cricketPlayers,
+      statsPeriods,statsPeriodLabel:periodMeta[s.statsPeriod],statsCount:statsCountTotal,statsCost:statsCostTotal,
+      statsBreakdown,statsHasData:statsBreakdown.length>0,statsNoData:statsBreakdown.length===0,statsSessions,
+      statsTabs,statsViewIsMe,statsViewIsBoard:!statsViewIsMe,leaderboard,hasLeaderboard:leaderboard.length>0,leaderboardEmpty:leaderboard.length===0,
+      attendanceBoard,hasAttendanceBoard:attendanceBoard.length>0,attendanceBoardEmpty:attendanceBoard.length===0,
+      dartPickerOptions,dartPickerOpen:s.dartPickerOpen,toggleDartPicker:()=>this.toggleDartPicker(),
+      dartVsLabel,dartCanRemove:s.dartPlayerIds.length>2,
+      dartStarted:s.dartStarted,dartNotStarted:!s.dartStarted,startDartRound:()=>this.startDartRound(),endDartRound:()=>this.endDartRound(),
+      navItems,
+    };
+  }
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
