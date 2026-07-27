@@ -90,6 +90,9 @@
             <sc-if value="{{ noOpenRounds }}" hint-placeholder-val="{{ false }}">
             <div style="margin-top:14px;padding-top:13px;border-top:1px dashed #e4d5b8;font:500 13px 'Work Sans';color:#8a7860">🍺 Aktuell schuldet niemand eine Runde. Prost!</div>
             </sc-if>
+            <sc-if value="{{ isLoadingRounds }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:14px;padding-top:13px;border-top:1px dashed #e4d5b8;font:500 13px 'Work Sans';color:#a08a6e">⏳ Lädt Rundenstand …</div>
+            </sc-if>
             <button onClick="{{ goRunde }}" style="width:100%;margin-top:13px;border:none;background:#8a6d1e;color:#fff;font:600 14px 'Work Sans';padding:12px;border-radius:12px;cursor:pointer">Wer zahlt? →</button>
           </div>
         </div>
@@ -172,6 +175,68 @@
             <sc-for list="{{ fasanServices }}" as="sv" hint-placeholder-count="4">
               <div style="background:#eaf1ec;border:1px solid #d3e2d8;border-radius:20px;padding:7px 13px;font:500 12px 'Work Sans';color:#2f5d3f">{{ sv }}</div>
             </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ ADMIN (nur Sven) ============ -->
+      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slidein .25s ease;padding-bottom:24px">
+        <div style="padding:18px 20px 14px;background:#3a2c1e;color:#f3e8d2">
+          <button onClick="{{ goHome }}" style="background:none;border:none;padding:0 0 8px;cursor:pointer;font:600 13px 'Work Sans';color:#e6b88a">← Zurück</button>
+          <div style="font:600 10px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#c9a877">Admin-Bereich</div>
+          <div style="font:600 22px 'Oswald';margin-top:2px">🛠️ Mitglieder & Getränke</div>
+        </div>
+
+        <div style="padding:16px">
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:4px 4px 10px">Mitglieder</div>
+          <sc-for list="{{ adminMembersView }}" as="m" hint-placeholder-count="10">
+            <div style="display:flex;align-items:center;gap:10px;background:#fff8ec;border:1px solid #e4d5b8;border-radius:13px;padding:9px 11px;margin-bottom:8px">
+              <div style="width:32px;height:32px;border-radius:50%;background:{{ m.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Oswald';flex:none">{{ m.initials }}</div>
+              <div style="flex:1;min-width:0;font:600 14px 'Work Sans';color:#2b2016">{{ m.name }} <span style="font-size:14px">{{ m.dogIcon }}</span></div>
+              <button onClick="{{ m.edit }}" style="border:1px solid #e4d5b8;background:#fff;color:#2f5d3f;font:600 12px 'Work Sans';padding:7px 10px;border-radius:9px;cursor:pointer;flex:none">Bearbeiten</button>
+              <button onClick="{{ m.remove }}" style="width:30px;height:30px;border-radius:9px;border:1px solid #e4d5b8;background:#fff;color:#a13d2d;font-size:16px;cursor:pointer;flex:none">✕</button>
+            </div>
+          </sc-for>
+
+          <div style="background:#fff8ec;border:1px dashed #cdbf9f;border-radius:14px;padding:13px;margin-top:8px">
+            <div style="font:600 12px 'Work Sans';color:#5c4c38;margin-bottom:8px">{{ memberSaveLabel }}</div>
+            <input type="text" value="{{ adminMemberName }}" onChange="{{ setAdminMemberName }}" placeholder="Name" style="width:100%;border:1px solid #e4d5b8;border-radius:11px;padding:9px 11px;font:500 13px 'Work Sans';margin-bottom:8px;box-sizing:border-box" />
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <input type="color" value="{{ adminMemberColor }}" onChange="{{ setAdminMemberColor }}" style="width:46px;height:38px;border:1px solid #e4d5b8;border-radius:9px;padding:2px;flex:none" />
+              <input type="text" value="{{ adminMemberIcon }}" onChange="{{ setAdminMemberIcon }}" placeholder="Emoji, z.B. 🐕" style="flex:1;border:1px solid #e4d5b8;border-radius:11px;padding:9px 11px;font:500 13px 'Work Sans';box-sizing:border-box" />
+            </div>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ saveMember }}" style="flex:1;border:none;background:#2f5d3f;color:#f3e8d2;font:600 13px 'Work Sans';padding:10px;border-radius:11px;cursor:pointer">{{ memberSaveLabel }}</button>
+              <sc-if value="{{ isEditingMember }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ cancelEditMember }}" style="border:1px solid #e4d5b8;background:#fff;color:#7a6a54;font:600 13px 'Work Sans';padding:10px 14px;border-radius:11px;cursor:pointer">Abbrechen</button>
+              </sc-if>
+            </div>
+          </div>
+
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:22px 4px 10px">Getränke</div>
+          <sc-for list="{{ adminDrinksView }}" as="d" hint-placeholder-count="10">
+            <div style="display:flex;align-items:center;gap:10px;background:#fff8ec;border:1px solid #e4d5b8;border-radius:13px;padding:9px 11px;margin-bottom:8px">
+              <div style="flex:1;min-width:0"><div style="font:600 14px 'Work Sans';color:#2b2016">{{ d.label }}</div><div style="font:500 11px 'Work Sans';color:#8a7860">{{ d.priceLabel }} · {{ d.beerLabel }}</div></div>
+              <button onClick="{{ d.edit }}" style="border:1px solid #e4d5b8;background:#fff;color:#2f5d3f;font:600 12px 'Work Sans';padding:7px 10px;border-radius:9px;cursor:pointer;flex:none">Bearbeiten</button>
+              <button onClick="{{ d.remove }}" style="width:30px;height:30px;border-radius:9px;border:1px solid #e4d5b8;background:#fff;color:#a13d2d;font-size:16px;cursor:pointer;flex:none">✕</button>
+            </div>
+          </sc-for>
+
+          <div style="background:#fff8ec;border:1px dashed #cdbf9f;border-radius:14px;padding:13px;margin-top:8px">
+            <div style="font:600 12px 'Work Sans';color:#5c4c38;margin-bottom:8px">{{ drinkSaveLabel }}</div>
+            <input type="text" value="{{ adminDrinkLabel }}" onChange="{{ setAdminDrinkLabel }}" placeholder="Bezeichnung, z.B. Alsterwasser" style="width:100%;border:1px solid #e4d5b8;border-radius:11px;padding:9px 11px;font:500 13px 'Work Sans';margin-bottom:8px;box-sizing:border-box" />
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+              <input type="text" inputmode="decimal" value="{{ adminDrinkPrice }}" onChange="{{ setAdminDrinkPrice }}" placeholder="Preis, z.B. 4.50" style="flex:1;border:1px solid #e4d5b8;border-radius:11px;padding:9px 11px;font:500 13px 'Work Sans';box-sizing:border-box" />
+              <button onClick="{{ toggleAdminDrinkBeer }}" style="border:1px solid #e4d5b8;background:#fff;color:#5c4c38;font:600 12px 'Work Sans';padding:9px 12px;border-radius:11px;cursor:pointer;white-space:nowrap">🍺 Bier: {{ adminDrinkBeerLabel }}</button>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button onClick="{{ saveDrink }}" style="flex:1;border:none;background:#2f5d3f;color:#f3e8d2;font:600 13px 'Work Sans';padding:10px;border-radius:11px;cursor:pointer">{{ drinkSaveLabel }}</button>
+              <sc-if value="{{ isEditingDrink }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ cancelEditDrink }}" style="border:1px solid #e4d5b8;background:#fff;color:#7a6a54;font:600 13px 'Work Sans';padding:10px 14px;border-radius:11px;cursor:pointer">Abbrechen</button>
+              </sc-if>
+            </div>
           </div>
         </div>
       </div>
@@ -300,6 +365,9 @@
           </sc-if>
           <sc-if value="{{ noOpenRounds }}" hint-placeholder-val="{{ false }}">
           <div style="background:#fff8ec;border:1px dashed #e4d5b8;border-radius:16px;padding:20px;text-align:center;font:500 14px 'Work Sans';color:#8a7860">🍺 Aktuell keine offene Runde. Prost!</div>
+          </sc-if>
+          <sc-if value="{{ isLoadingRounds }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff8ec;border:1px dashed #e4d5b8;border-radius:16px;padding:20px;text-align:center;font:500 14px 'Work Sans';color:#a08a6e">⏳ Lädt Rundenstand …</div>
           </sc-if>
 
           <!-- add a round -->
@@ -638,6 +706,13 @@ class Component extends DCLogic {
     drinks:{},
     payerIndex:2,
     rounds:[],
+    roundsLoaded:false,
+    membersData:null,
+    drinksData:null,
+    adminEditMemberId:null,
+    adminMemberDraft:{name:'',color:'#2f5d3f',dogIcon:'🐕'},
+    adminEditDrinkId:null,
+    adminDrinkDraft:{label:'',price:'',beer:false},
     addMid:null,
     addReason:null,
     dartMode:'501',
@@ -666,7 +741,7 @@ class Component extends DCLogic {
     let m = null;
     try { m = document.cookie.match(/(?:^|; )stammtisch_user=([^;]+)/); } catch(e){}
     const id = m ? decodeURIComponent(m[1]) : null;
-    return this.members.some(mem=>mem.id===id) ? id : null;
+    return this.getMembers().some(mem=>mem.id===id) ? id : null;
   }
   selectUser(id){
     try { document.cookie = 'stammtisch_user='+encodeURIComponent(id)+';max-age=31536000;path=/'; } catch(e){}
@@ -674,6 +749,8 @@ class Component extends DCLogic {
     this.fetchSheetHistory();
     this.fetchAttendance();
     this.fetchRounds();
+    this.fetchMembers();
+    this.fetchDrinksList();
   }
   logout(){
     try { document.cookie = 'stammtisch_user=;max-age=0;path=/'; } catch(e){}
@@ -737,8 +814,8 @@ class Component extends DCLogic {
     if(!url) return;
     fetch(url+'?action=rounds&_='+Date.now(), { cache:'no-store' })
       .then(r=>r.json())
-      .then(data=>{ if(data && Array.isArray(data.rounds)) this.setState({ rounds:data.rounds }); })
-      .catch(()=>{});
+      .then(data=>{ if(data && Array.isArray(data.rounds)) this.setState({ rounds:data.rounds, roundsLoaded:true }); else this.setState({ roundsLoaded:true }); })
+      .catch(()=>this.setState({ roundsLoaded:true }));
   }
   pushAddRound(mid, reason){
     const url=this.state.sheetUrl;
@@ -768,12 +845,79 @@ class Component extends DCLogic {
     }).then(()=>this.fetchRounds()).catch(()=>{});
   }
 
+  // ---- dynamische Mitglieder- & Getränkeliste (aus Sheet, mit Fallback auf Standardwerte) ----
+  getMembers(){ return this.state.membersData || this.members; }
+  getDrinksList(){ return this.state.drinksData || this.drinksList; }
+
+  fetchMembers(){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    fetch(url+'?action=members&_='+Date.now(), { cache:'no-store' })
+      .then(r=>r.json())
+      .then(data=>{ if(data && Array.isArray(data.members) && data.members.length) this.setState({ membersData:data.members }); })
+      .catch(()=>{});
+  }
+  fetchDrinksList(){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    fetch(url+'?action=drinksList&_='+Date.now(), { cache:'no-store' })
+      .then(r=>r.json())
+      .then(data=>{ if(data && Array.isArray(data.drinksList) && data.drinksList.length) this.setState({ drinksData:data.drinksList }); })
+      .catch(()=>{});
+  }
+
+  // -- Admin: Mitglieder --
+  setAdminMemberDraft(field, v){ this.setState(s=>({ adminMemberDraft:{...s.adminMemberDraft, [field]:v} })); }
+  editMember(m){ this.setState({ adminEditMemberId:m.id, adminMemberDraft:{ name:m.name, color:m.color, dogIcon:m.dogIcon } }); }
+  cancelEditMember(){ this.setState({ adminEditMemberId:null, adminMemberDraft:{name:'',color:'#2f5d3f',dogIcon:'🐕'} }); }
+  saveMember(){
+    const url=this.state.sheetUrl; const d=this.state.adminMemberDraft;
+    if(!url || !d.name || !d.name.trim()) return;
+    const editId=this.state.adminEditMemberId;
+    const body = editId
+      ? { action:'updateMember', id:editId, name:d.name.trim(), color:d.color||'#2f5d3f', dogIcon:d.dogIcon||'🐕' }
+      : { action:'addMember', name:d.name.trim(), color:d.color||'#2f5d3f', dogIcon:d.dogIcon||'🐕' };
+    fetch(url, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(body) })
+      .then(()=>{ this.fetchMembers(); this.cancelEditMember(); }).catch(()=>{});
+  }
+  deleteMember(id){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    if(!confirm('Mitglied wirklich löschen?')) return;
+    fetch(url, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({ action:'deleteMember', id }) })
+      .then(()=>this.fetchMembers()).catch(()=>{});
+  }
+
+  // -- Admin: Getränke --
+  setAdminDrinkDraft(field, v){ this.setState(s=>({ adminDrinkDraft:{...s.adminDrinkDraft, [field]:v} })); }
+  editDrink(d){ this.setState({ adminEditDrinkId:d.id, adminDrinkDraft:{ label:d.label, price:String(d.price), beer:!!d.beer } }); }
+  cancelEditDrink(){ this.setState({ adminEditDrinkId:null, adminDrinkDraft:{label:'',price:'',beer:false} }); }
+  toggleAdminDrinkBeer(){ this.setState(s=>({ adminDrinkDraft:{...s.adminDrinkDraft, beer:!s.adminDrinkDraft.beer} })); }
+  saveDrink(){
+    const url=this.state.sheetUrl; const d=this.state.adminDrinkDraft;
+    if(!url || !d.label || !d.label.trim()) return;
+    const editId=this.state.adminEditDrinkId;
+    const body = editId
+      ? { action:'updateDrink', id:editId, label:d.label.trim(), price:parseFloat(d.price)||0, beer:!!d.beer }
+      : { action:'addDrink', label:d.label.trim(), price:parseFloat(d.price)||0, beer:!!d.beer };
+    fetch(url, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(body) })
+      .then(()=>{ this.fetchDrinksList(); this.cancelEditDrink(); }).catch(()=>{});
+  }
+  deleteDrink(id){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    if(!confirm('Getränk wirklich löschen?')) return;
+    fetch(url, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({ action:'deleteDrink', id }) })
+      .then(()=>this.fetchDrinksList()).catch(()=>{});
+  }
+
   go(screen){ return () => {
     this.setState({ screen });
     if(!this.state.sheetUrl) return;
     if(screen==='stats') this.fetchSheetHistory();
     if(screen==='home' || screen==='runde'){ this.fetchRounds(); this.fetchAttendance(); }
     if(screen==='termin') this.fetchAttendance();
+    if(screen==='admin'){ this.fetchMembers(); this.fetchDrinksList(); }
   }; }
 
   // ---- next Stammtisch: first Wednesday not in the past ----
@@ -792,10 +936,10 @@ class Component extends DCLogic {
     this.setState(s=>({ attendance:{...s.attendance, [id]: newVal } }));
     if(this.state.sheetUrl) this.pushAttendance(id, newVal);
   }
-  addDrink(mid,did,delta){ this.setState(s=>{ const dr={...s.drinks}; const md={...(dr[mid]||{})}; md[did]=Math.max(0,(md[did]||0)+delta); dr[mid]=md; return {drinks:dr}; }); const cd=this.state.customDrinks[mid]; const d=did==='custom'?{label:(cd&&cd.name)||'Weitere'}:this.drinksList.find(x=>x.id===did); this.pushDrinkToSheet(mid,d?d.label:did,delta,new Date().toISOString().slice(0,10)); }
+  addDrink(mid,did,delta){ this.setState(s=>{ const dr={...s.drinks}; const md={...(dr[mid]||{})}; md[did]=Math.max(0,(md[did]||0)+delta); dr[mid]=md; return {drinks:dr}; }); const cd=this.state.customDrinks[mid]; const d=did==='custom'?{label:(cd&&cd.name)||'Weitere'}:this.getDrinksList().find(x=>x.id===did); this.pushDrinkToSheet(mid,d?d.label:did,delta,new Date().toISOString().slice(0,10)); }
   setCustomName(mid,name){ this.setState(s=>({ customDrinks:{...s.customDrinks, [mid]:{...(s.customDrinks[mid]||{name:'',price:0}), name} } })); }
   setCustomPrice(mid,price){ this.setState(s=>({ customDrinks:{...s.customDrinks, [mid]:{...(s.customDrinks[mid]||{name:'',price:0}), price:parseFloat(price)||0} } })); }
-  payNext(){ this.setState(s=>({ payerIndex:(s.payerIndex+1)%this.members.length })); }
+  payNext(){ this.setState(s=>({ payerIndex:(s.payerIndex+1)%this.getMembers().length })); }
   setPayer(idx){ this.setState({ payerIndex:idx }); }
   removeRound(id){
     this.setState(s=>({ rounds:s.rounds.filter(r=>r.id!==id) }));
@@ -908,17 +1052,17 @@ class Component extends DCLogic {
   }
 
   componentDidMount(){
-    if(this.state.sheetUrl){ this.fetchSheetHistory(); this.fetchAttendance(); this.fetchRounds(); }
+    if(this.state.sheetUrl){ this.fetchSheetHistory(); this.fetchAttendance(); this.fetchRounds(); this.fetchMembers(); this.fetchDrinksList(); }
   }
 
   renderVals(){
-    const s=this.state, M=this.members;
+    const s=this.state, M=this.getMembers();
     if(!s.currentUser){
       const pickerMembers = [...M].sort((a,b)=>a.name.localeCompare(b.name,'de')).map(m=>({
         id:m.id,name:m.name,color:m.color,initials:this.initials(m.name),dogIcon:m.dogIcon,pick:()=>this.selectUser(m.id),
       }));
       return { isPicker:true, hasUser:false, clock:this.clock, pickerMembers,
-        isHome:false,isTermin:false,isGetraenke:false,isRunde:false,isDart:false,isStats:false,isInfo:false };
+        isHome:false,isTermin:false,isGetraenke:false,isRunde:false,isDart:false,isStats:false,isInfo:false,isAdmin:false };
     }
     const att=s.attendance;
     const isYes=id=>att[id]==='yes', isNo=id=>att[id]==='no';
@@ -940,6 +1084,9 @@ class Component extends DCLogic {
       {icon:'🎯',title:'Dart',sub:'501 & Cricket',bg:'#eceaf0',go:this.go('dart')},
       {icon:'📊',title:'Statistik',sub:'Bier & Ausgaben',bg:'#eaf1ec',go:this.go('stats')},
     ];
+    if(s.currentUser==='sven'){
+      tiles.push({icon:'🛠️',title:'Admin',sub:'Mitglieder & Getränke',bg:'#f3e6e6',go:this.go('admin')});
+    }
 
     // ---- current user ("Du") ----
     const eur=n=>n.toFixed(2).replace('.',',')+' €';
@@ -960,7 +1107,8 @@ class Component extends DCLogic {
 
     // drinks (nur eigene Strichliste)
     const md=s.drinks[me.id]||{};
-    const meDrinks=this.drinksList.map(d=>{ const c=md[d.id]||0; return {
+    const DL=this.getDrinksList();
+    const meDrinks=DL.map(d=>{ const c=md[d.id]||0; return {
       label:d.label,count:c,priceLabel:eur(d.price),lineLabel:eur(c*d.price),rowBg:c>0?'#fdf6e6':'#fff8ec',
       inc:()=>this.addDrink(me.id,d.id,1),dec:()=>this.addDrink(me.id,d.id,-1)
     };});
@@ -968,7 +1116,7 @@ class Component extends DCLogic {
     const customCount = md['custom']||0;
     const customPriceNum = customDef.price||0;
     const meDrinkTotal=meDrinks.reduce((a,b)=>a+b.count,0)+customCount;
-    const meCost=eur(this.drinksList.reduce((a,d)=>a+(md[d.id]||0)*d.price,0) + customPriceNum*customCount);
+    const meCost=eur(DL.reduce((a,d)=>a+(md[d.id]||0)*d.price,0) + customPriceNum*customCount);
 
     // Runden (mehrere möglich, mit Grund) – offen und bezahlt getrennt, Zeitpunkt spielt keine Rolle
     const memById=id=>M.find(m=>m.id===id);
@@ -1022,7 +1170,7 @@ class Component extends DCLogic {
     const eur2=n=>n.toFixed(2).replace('.',',')+' €';
     const todayRef = this.nextStammtisch ? new Date(2026,6,21) : new Date();
     const parseDate_=ds=>{ if(typeof ds==='string' && /^\d{4}-\d{2}-\d{2}/.test(ds)) return new Date(ds.slice(0,10)+'T00:00:00'); const d=new Date(ds); return isNaN(d.getTime())?new Date():d; };
-    const resolveDrink_=key=>this.drinksList.find(d=>d.id===key||d.label===key);
+    const resolveDrink_=key=>this.getDrinksList().find(d=>d.id===key||d.label===key);
     const normItems_=items=>{ const out={}; Object.entries(items||{}).forEach(([k,c])=>{ const d=resolveDrink_(k); const id=d?d.id:k; out[id]=(out[id]||0)+c; }); return out; };
     const liveItems = s.drinks[me.id]||{};
     const liveHasData = Object.values(liveItems).some(v=>v>0);
@@ -1054,7 +1202,7 @@ class Component extends DCLogic {
     });
 
     // Rangliste: nur Biere (Kleines/Großes Helles, Weizen), alle Mitglieder im gewaehlten Zeitraum
-    const beerIds = this.drinksList.filter(d=>d.beer).map(d=>d.id);
+    const beerIds = this.getDrinksList().filter(d=>d.beer).map(d=>d.id);
     const remoteAll = (s.remoteHistory || this.drinkHistory).map(e=>({...e,items:normItems_(e.items)}));
     const liveByMid = liveHasData ? { [me.id]: liveItems } : {};
     const allDrinkEntries = [...remoteAll, ...Object.entries(liveByMid).map(([mid,items])=>({date:todayRef.toISOString().slice(0,10),mid,items:normItems_(items)}))];
@@ -1062,7 +1210,7 @@ class Component extends DCLogic {
     const totalsByMember = {};
     drinkPeriodEntries.forEach(e=>{
       const beerItems=Object.fromEntries(Object.entries(e.items).filter(([id])=>beerIds.includes(id)));
-      const cnt=Object.values(beerItems).reduce((a,b)=>a+b,0); const cost=this.drinksList.reduce((a,d)=>a+(beerItems[d.id]||0)*d.price,0);
+      const cnt=Object.values(beerItems).reduce((a,b)=>a+b,0); const cost=this.getDrinksList().reduce((a,d)=>a+(beerItems[d.id]||0)*d.price,0);
       if(!totalsByMember[e.mid]) totalsByMember[e.mid]={count:0,cost:0}; totalsByMember[e.mid].count+=cnt; totalsByMember[e.mid].cost+=cost;
     });
     const leaderboard = M.map(m=>({ m, count:(totalsByMember[m.id]||{count:0}).count, cost:(totalsByMember[m.id]||{cost:0}).cost }))
@@ -1102,11 +1250,37 @@ class Component extends DCLogic {
     const navItems=nav.map(([sc,ic,lb])=>{ const on=s.screen===sc; return {icon:ic,label:lb,go:this.go(sc),
       color:on?'#2f5d3f':'#b0997a',filter:on?'none':'grayscale(1) opacity(.55)'};});
 
+    // ---- Admin: Mitglieder & Getränke verwalten (nur Sven) ----
+    const isAdminUser = s.currentUser==='sven';
+    const adminMembersView = M.map(m=>({
+      id:m.id, name:m.name, color:m.color, dogIcon:m.dogIcon, initials:this.initials(m.name),
+      edit:()=>this.editMember(m), remove:()=>this.deleteMember(m.id),
+    }));
+    const adminDrinksView = DL.map(d=>({
+      id:d.id, label:d.label, priceLabel:eur(d.price), beerLabel:d.beer?'Bier':'Sonstiges',
+      edit:()=>this.editDrink(d), remove:()=>this.deleteDrink(d.id),
+    }));
+
     return {
       isPicker:false, hasUser:true, pickerMembers:[],
       clock:this.clock,
       isHome:s.screen==='home',isTermin:s.screen==='termin',isGetraenke:s.screen==='getraenke',
       isRunde:s.screen==='runde',isDart:s.screen==='dart',isStats:s.screen==='stats',isInfo:s.screen==='info',
+      isAdmin:s.screen==='admin' && isAdminUser, isAdminUser,
+      adminMembersView, adminDrinksView,
+      adminMemberName:s.adminMemberDraft.name, adminMemberColor:s.adminMemberDraft.color, adminMemberIcon:s.adminMemberDraft.dogIcon,
+      setAdminMemberName:e=>this.setAdminMemberDraft('name',e.target.value),
+      setAdminMemberColor:e=>this.setAdminMemberDraft('color',e.target.value),
+      setAdminMemberIcon:e=>this.setAdminMemberDraft('dogIcon',e.target.value),
+      saveMember:()=>this.saveMember(), cancelEditMember:()=>this.cancelEditMember(),
+      isEditingMember:!!s.adminEditMemberId, memberSaveLabel:s.adminEditMemberId?'Änderungen speichern':'+ Mitglied hinzufügen',
+      adminDrinkLabel:s.adminDrinkDraft.label, adminDrinkPrice:s.adminDrinkDraft.price, adminDrinkBeer:s.adminDrinkDraft.beer,
+      adminDrinkBeerLabel:s.adminDrinkDraft.beer?'Ja':'Nein',
+      setAdminDrinkLabel:e=>this.setAdminDrinkDraft('label',e.target.value),
+      setAdminDrinkPrice:e=>this.setAdminDrinkDraft('price',e.target.value),
+      toggleAdminDrinkBeer:()=>this.toggleAdminDrinkBeer(),
+      saveDrink:()=>this.saveDrink(), cancelEditDrink:()=>this.cancelEditDrink(),
+      isEditingDrink:!!s.adminEditDrinkId, drinkSaveLabel:s.adminEditDrinkId?'Änderungen speichern':'+ Getränk hinzufügen',
       goInfo:this.go('info'),goHome:this.go('home'),goRunde:this.go('runde'),logout:()=>this.logout(),
       fasanHours,fasanServices,
       sheetUrl:s.sheetUrl,sheetUrlDraft:s.sheetUrlDraft,setSheetUrlDraft:e=>this.setSheetUrlDraft(e.target.value),saveSheetUrl:()=>this.saveSheetUrl(),
@@ -1124,7 +1298,7 @@ class Component extends DCLogic {
       hasUp:!!up, noUp:!up, upName:up?up.name:'', upInitials:up?up.initials:'', upColor:up?up.color:'#8a6d1e',
       upReason:up?up.reason:'', upPay:()=>{ if(up) this.markRoundPaid(up.id); },
       hasMoreRounds:queue.length>1, moreRoundsCount:Math.max(0,queue.length-1),
-      openRounds,hasOpenRounds:openRounds.length>0,noOpenRounds:openRounds.length===0,paidRounds,hasPaidRounds:paidRounds.length>0,
+      openRounds,hasOpenRounds:openRounds.length>0,noOpenRounds:openRounds.length===0 && s.roundsLoaded,isLoadingRounds:!s.roundsLoaded,paidRounds,hasPaidRounds:paidRounds.length>0,
       debtRows,hasDebt:debtRows.length>0,
       addMembers,addReasonDraft,setAddReasonDraft:e=>this.setAddReasonDraft(e.target.value),
       canAdd:!!(s.addMid&&s.addReason&&s.addReason.trim()),addRound:()=>this.addRound(),
