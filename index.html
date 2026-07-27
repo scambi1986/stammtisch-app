@@ -176,6 +176,15 @@
               <div style="background:#eaf1ec;border:1px solid #d3e2d8;border-radius:20px;padding:7px 13px;font:500 12px 'Work Sans';color:#2f5d3f">{{ sv }}</div>
             </sc-for>
           </div>
+
+          <sc-if value="{{ isAdminUser }}" hint-placeholder-val="{{ false }}">
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:22px 4px 10px">Verwaltung</div>
+          <button onClick="{{ goAdmin }}" style="width:100%;display:flex;align-items:center;gap:12px;background:#3a2c1e;border:none;border-radius:16px;padding:15px 16px;cursor:pointer;text-align:left">
+            <span style="font-size:22px">🛠️</span>
+            <span style="flex:1"><span style="display:block;font:600 15px 'Oswald';color:#f3e8d2">Admin-Bereich</span><span style="display:block;font:500 12px 'Work Sans';color:#c9a877">Mitglieder & Getränke verwalten</span></span>
+            <span style="font:700 18px 'Oswald';color:#c9a877">→</span>
+          </button>
+          </sc-if>
         </div>
       </div>
       </sc-if>
@@ -636,7 +645,7 @@
 
   </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:880}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;adminUserId&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;sven&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Verwaltung&quot;},&quot;defaultStatsPeriod&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;month&quot;,&quot;options&quot;:[&quot;month&quot;,&quot;year&quot;,&quot;all&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Statistik&quot;}}">
 // Fest hinterlegte Google-Sheet-Anbindung (Apps-Script-Web-App).
 // Wird automatisch verwendet, falls kein individueller Wert in localStorage liegt.
 const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwymwv-XA6xajR2qvFcRujh4G-m1mwTeYYGCdYimVTlDNyhVJwSh0qzpWMoQP4FgfZxNw/exec';
@@ -649,6 +658,7 @@ class Component extends DCLogic {
     { id:'felix', name:'Felix', color:'#a13d2d', dogIcon:'🦮' },
     { id:'flo', name:'Flo', color:'#3a5a80', dogIcon:'🐕‍🦺' },
     { id:'martin', name:'Martin', color:'#6b4a7a', dogIcon:'🐕' },
+    { id:'niklas', name:'Niklas', color:'#ff0000', dogIcon:'🐩' },
     { id:'roman', name:'Roman', color:'#2f5d3f', dogIcon:'🐩' },
     { id:'sebastian', name:'Sebastian', color:'#7a3b12', dogIcon:'🐶' },
     { id:'sven', name:'Sven', color:'#8a6d1e', dogIcon:'🦮' },
@@ -728,7 +738,7 @@ class Component extends DCLogic {
     dartPickerOpen:false,
     dartStarted:false,
     dartConfirmReset:false,
-    statsPeriod:'month',
+    statsPeriod:this.props.defaultStatsPeriod ?? 'month',
     statsView:'me',
     openSessionKey:null,
     customDrinks:{},
@@ -1056,8 +1066,9 @@ class Component extends DCLogic {
   }
 
   renderVals(){
-    const s=this.state, M=this.getMembers();
-    if(!s.currentUser){
+    const s=this.state, M=this.getMembers().slice().sort((a,b)=>a.name.localeCompare(b.name,'de'));
+    const knownUser = s.currentUser && M.some(m=>m.id===s.currentUser);
+    if(!knownUser){
       const pickerMembers = [...M].sort((a,b)=>a.name.localeCompare(b.name,'de')).map(m=>({
         id:m.id,name:m.name,color:m.color,initials:this.initials(m.name),dogIcon:m.dogIcon,pick:()=>this.selectUser(m.id),
       }));
@@ -1084,7 +1095,7 @@ class Component extends DCLogic {
       {icon:'🎯',title:'Dart',sub:'501 & Cricket',bg:'#eceaf0',go:this.go('dart')},
       {icon:'📊',title:'Statistik',sub:'Bier & Ausgaben',bg:'#eaf1ec',go:this.go('stats')},
     ];
-    if(s.currentUser==='sven'){
+    if(s.currentUser===(this.props.adminUserId ?? 'sven')){
       tiles.push({icon:'🛠️',title:'Admin',sub:'Mitglieder & Getränke',bg:'#f3e6e6',go:this.go('admin')});
     }
 
@@ -1119,7 +1130,7 @@ class Component extends DCLogic {
     const meCost=eur(DL.reduce((a,d)=>a+(md[d.id]||0)*d.price,0) + customPriceNum*customCount);
 
     // Runden (mehrere möglich, mit Grund) – offen und bezahlt getrennt, Zeitpunkt spielt keine Rolle
-    const memById=id=>M.find(m=>m.id===id);
+    const memById=id=>M.find(m=>m.id===id)||{id:id,name:'Unbekannt',color:'#8a7860',dogIcon:'🐕'};
     const roundView=r=>{ const m=memById(r.mid); return {id:r.id,name:m.name,initials:this.initials(m.name),color:m.color,reason:r.reason,
       markPaid:()=>this.markRoundPaid(r.id),markUnpaid:()=>this.markRoundUnpaid(r.id),remove:()=>this.removeRound(r.id)}; };
     const openRounds=s.rounds.filter(r=>!r.paid).map(roundView);
@@ -1251,7 +1262,7 @@ class Component extends DCLogic {
       color:on?'#2f5d3f':'#b0997a',filter:on?'none':'grayscale(1) opacity(.55)'};});
 
     // ---- Admin: Mitglieder & Getränke verwalten (nur Sven) ----
-    const isAdminUser = s.currentUser==='sven';
+    const isAdminUser = s.currentUser===(this.props.adminUserId ?? 'sven');
     const adminMembersView = M.map(m=>({
       id:m.id, name:m.name, color:m.color, dogIcon:m.dogIcon, initials:this.initials(m.name),
       edit:()=>this.editMember(m), remove:()=>this.deleteMember(m.id),
@@ -1266,7 +1277,7 @@ class Component extends DCLogic {
       clock:this.clock,
       isHome:s.screen==='home',isTermin:s.screen==='termin',isGetraenke:s.screen==='getraenke',
       isRunde:s.screen==='runde',isDart:s.screen==='dart',isStats:s.screen==='stats',isInfo:s.screen==='info',
-      isAdmin:s.screen==='admin' && isAdminUser, isAdminUser,
+      isAdmin:s.screen==='admin' && isAdminUser, isAdminUser, goAdmin:this.go('admin'),
       adminMembersView, adminDrinksView,
       adminMemberName:s.adminMemberDraft.name, adminMemberColor:s.adminMemberDraft.color, adminMemberIcon:s.adminMemberDraft.dogIcon,
       setAdminMemberName:e=>this.setAdminMemberDraft('name',e.target.value),
