@@ -699,7 +699,7 @@ class Component extends DCLogic {
     const url=this.state.sheetUrl;
     if(!url) return;
     this.setState({ sheetStatus:'loading' });
-    fetch(url+'?action=history')
+    fetch(url+'?action=history&_='+Date.now(), { cache:'no-store' })
       .then(r=>r.json())
       .then(data=>this.setState({ remoteHistory: Array.isArray(data.history)?data.history:[], sheetStatus:'ok' }))
       .catch(()=>this.setState({ sheetStatus:'error' }));
@@ -718,7 +718,7 @@ class Component extends DCLogic {
   fetchAttendance(){
     const url=this.state.sheetUrl;
     if(!url) return;
-    fetch(url+'?action=attendance')
+    fetch(url+'?action=attendance&_='+Date.now(), { cache:'no-store' })
       .then(r=>r.json())
       .then(data=>{ if(data && data.attendance) this.setState({ attendance:data.attendance }); })
       .catch(()=>{});
@@ -735,7 +735,7 @@ class Component extends DCLogic {
   fetchRounds(){
     const url=this.state.sheetUrl;
     if(!url) return;
-    fetch(url+'?action=rounds')
+    fetch(url+'?action=rounds&_='+Date.now(), { cache:'no-store' })
       .then(r=>r.json())
       .then(data=>{ if(data && Array.isArray(data.rounds)) this.setState({ rounds:data.rounds }); })
       .catch(()=>{});
@@ -768,7 +768,13 @@ class Component extends DCLogic {
     }).then(()=>this.fetchRounds()).catch(()=>{});
   }
 
-  go(screen){ return () => { this.setState({ screen }); if(screen==='stats' && this.state.sheetUrl) this.fetchSheetHistory(); }; }
+  go(screen){ return () => {
+    this.setState({ screen });
+    if(!this.state.sheetUrl) return;
+    if(screen==='stats') this.fetchSheetHistory();
+    if(screen==='home' || screen==='runde'){ this.fetchRounds(); this.fetchAttendance(); }
+    if(screen==='termin') this.fetchAttendance();
+  }; }
 
   // ---- next Stammtisch: first Wednesday not in the past ----
   nextStammtisch(){
