@@ -569,6 +569,10 @@
   </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:880}}">
+// Fest hinterlegte Google-Sheet-Anbindung (Apps-Script-Web-App).
+// Wird automatisch verwendet, falls kein individueller Wert in localStorage liegt.
+const DEFAULT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwymwv-XA6xajR2qvFcRujh4G-m1mwTeYYGCdYimVTlDNyhVJwSh0qzpWMoQP4FgfZxNw/exec';
+
 class Component extends DCLogic {
   members = [
     { id:'carsten', name:'Carsten', color:'#2f5d3f', dogIcon:'🐕' },
@@ -626,18 +630,14 @@ class Component extends DCLogic {
   state = {
     screen:'home',
     currentUser:this.readUserCookie(),
-    sheetUrl:(typeof localStorage!=='undefined' && localStorage.getItem('stammtisch_sheet_url'))||'',
+    sheetUrl:(typeof localStorage!=='undefined' && localStorage.getItem('stammtisch_sheet_url')) || DEFAULT_SHEET_URL,
     sheetUrlDraft:'',
     sheetStatus:'idle',
     remoteHistory:null,
-    attendance:{ danny:'yes', roman:'yes', flo:'yes', christian:'no', sven:'yes' },
+    attendance:{},
     drinks:{},
     payerIndex:2,
-    rounds:[
-      { id:1, mid:'christian', reason:'Hat beim Dart verloren', paid:false },
-      { id:2, mid:'christian', reason:'Geburtstag', paid:false },
-      { id:3, mid:'flo', reason:'Wette verloren', paid:false },
-    ],
+    rounds:[],
     addMid:null,
     addReason:null,
     dartMode:'501',
