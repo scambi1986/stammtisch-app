@@ -1,0 +1,21 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hundefreunde App-Icon">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFE7C7"></stop>
+      <stop offset="100%" stop-color="#FFD199"></stop>
+    </linearGradient>
+    <clipPath id="rightHalf2"><rect x="256" y="0" width="256" height="512"></rect></clipPath>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#tile)"></rect>
+  
+  <g transform="translate(256 268) scale(0.78) translate(-256 -262)">
+    <path d="M158 92 C96 84 44 120 26 195 C10 262 14 360 52 420 C82 466 132 462 156 418 C140 350 132 190 158 92 Z" fill="#A24603"></path>
+    <path d="M354 92 C416 84 468 120 486 195 C502 262 498 360 460 420 C430 466 380 462 356 418 C372 350 380 190 354 92 Z" fill="#803602"></path>
+    <path id="head2" d="M256 54 C304 54 344 64 372 96 C402 130 416 178 410 226 C404 284 374 348 322 404 C298 442 276 462 256 470 C236 462 214 442 190 404 C138 348 108 284 102 226 C96 178 110 130 140 96 C168 64 208 54 256 54 Z" fill="#B34F03"></path>
+    <use href="#head2" fill="#A24603" clip-path="url(#rightHalf2)"></use>
+    <ellipse cx="195" cy="200" rx="15" ry="17" fill="#2E2E2E"></ellipse>
+    <ellipse cx="318" cy="200" rx="15" ry="17" fill="#1A1A1A"></ellipse>
+    <path id="nose2" d="M256 338 C294 338 315 359 315 386 C315 414 288 434 256 450 C224 434 197 414 197 386 C197 359 218 338 256 338 Z" fill="#2E2E2E"></path>
+    <use href="#nose2" fill="#1A1A1A" clip-path="url(#rightHalf2)"></use>
+  </g>
+</svg>
