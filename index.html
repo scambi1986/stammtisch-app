@@ -144,19 +144,10 @@
 
           <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:20px 4px 10px">Datenanbindung</div>
           <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:14px 15px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-              <span style="font:600 13px 'Work Sans';color:#2b2016">Google Sheet</span>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font:500 13px 'Work Sans';color:#2b2016">Google Sheet</span>
               <span style="font:600 11px 'Work Sans';color:#8a7860">{{ sheetStatusLabel }}</span>
             </div>
-            <sc-if value="{{ sheetConnected }}" hint-placeholder-val="{{ false }}">
-            <div style="font:500 12px 'Work Sans';color:#8a7860;word-break:break-all;margin-bottom:10px">{{ sheetUrl }}</div>
-            <button onClick="{{ disconnectSheet }}" style="width:100%;border:1px solid #e4d5b8;background:#fff;color:#a13d2d;font:600 13px 'Work Sans';padding:10px;border-radius:11px;cursor:pointer">Trennen</button>
-            </sc-if>
-            <sc-if value="{{ sheetNotConnected }}" hint-placeholder-val="{{ true }}">
-            <div style="font:500 12px 'Work Sans';color:#8a7860;margin-bottom:10px;line-height:1.4">Apps-Script-Web-App-URL einfügen, um die Statistik live aus dem Google Sheet zu ziehen.</div>
-            <input type="text" value="{{ sheetUrlDraft }}" onChange="{{ setSheetUrlDraft }}" placeholder="https://script.google.com/macros/s/…/exec" style="width:100%;border:1px solid #e4d5b8;border-radius:11px;padding:10px 12px;font:500 13px 'Work Sans';margin-bottom:10px;box-sizing:border-box" />
-            <button onClick="{{ saveSheetUrl }}" style="width:100%;border:none;background:#2f5d3f;color:#f3e8d2;font:600 13px 'Work Sans';padding:10px;border-radius:11px;cursor:pointer">Verbinden</button>
-            </sc-if>
           </div>
 
           <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:20px 4px 10px">Öffnungszeiten</div>
