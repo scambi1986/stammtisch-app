@@ -672,6 +672,8 @@ class Component extends DCLogic {
     try { document.cookie = 'stammtisch_user='+encodeURIComponent(id)+';max-age=31536000;path=/'; } catch(e){}
     this.setState({ currentUser:id });
     this.fetchSheetHistory();
+    this.fetchAttendance();
+    this.fetchRounds();
   }
   logout(){
     try { document.cookie = 'stammtisch_user=;max-age=0;path=/'; } catch(e){}
@@ -686,6 +688,8 @@ class Component extends DCLogic {
     if(typeof localStorage!=='undefined') localStorage.setItem('stammtisch_sheet_url', url);
     this.setState({ sheetUrl:url, sheetUrlDraft:'' });
     this.fetchSheetHistory();
+    this.fetchAttendance();
+    this.fetchRounds();
   }
   disconnectSheet(){
     if(typeof localStorage!=='undefined') localStorage.removeItem('stammtisch_sheet_url');
@@ -710,6 +714,60 @@ class Component extends DCLogic {
     }).then(()=>this.fetchSheetHistory()).catch(()=>{});
   }
 
+  // ---- Zusagen & Runden ebenfalls im Sheet synchronisieren ----
+  fetchAttendance(){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    fetch(url+'?action=attendance')
+      .then(r=>r.json())
+      .then(data=>{ if(data && data.attendance) this.setState({ attendance:data.attendance }); })
+      .catch(()=>{});
+  }
+  pushAttendance(mid, val){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({ action:'setAttendance', mid, status: val }),
+    }).then(()=>this.fetchAttendance()).catch(()=>{});
+  }
+  fetchRounds(){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    fetch(url+'?action=rounds')
+      .then(r=>r.json())
+      .then(data=>{ if(data && Array.isArray(data.rounds)) this.setState({ rounds:data.rounds }); })
+      .catch(()=>{});
+  }
+  pushAddRound(mid, reason){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({ action:'addRound', mid, reason }),
+    }).then(()=>this.fetchRounds()).catch(()=>{});
+  }
+  pushRoundStatus(id, paid){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({ action: paid?'markRoundPaid':'markRoundUnpaid', id }),
+    }).then(()=>this.fetchRounds()).catch(()=>{});
+  }
+  pushRemoveRound(id){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({ action:'removeRound', id }),
+    }).then(()=>this.fetchRounds()).catch(()=>{});
+  }
+
   go(screen){ return () => { this.setState({ screen }); if(screen==='stats' && this.state.sheetUrl) this.fetchSheetHistory(); }; }
 
   // ---- next Stammtisch: first Wednesday not in the past ----
@@ -723,20 +781,38 @@ class Component extends DCLogic {
 
   initials(name){ return name.slice(0,2).toUpperCase(); }
 
-  setAttend(id,val){ this.setState(s=>({ attendance:{...s.attendance, [id]: s.attendance[id]===val?null:val } })); }
+  setAttend(id,val){
+    const newVal = this.state.attendance[id]===val ? null : val;
+    this.setState(s=>({ attendance:{...s.attendance, [id]: newVal } }));
+    if(this.state.sheetUrl) this.pushAttendance(id, newVal);
+  }
   addDrink(mid,did,delta){ this.setState(s=>{ const dr={...s.drinks}; const md={...(dr[mid]||{})}; md[did]=Math.max(0,(md[did]||0)+delta); dr[mid]=md; return {drinks:dr}; }); const cd=this.state.customDrinks[mid]; const d=did==='custom'?{label:(cd&&cd.name)||'Weitere'}:this.drinksList.find(x=>x.id===did); this.pushDrinkToSheet(mid,d?d.label:did,delta,new Date().toISOString().slice(0,10)); }
   setCustomName(mid,name){ this.setState(s=>({ customDrinks:{...s.customDrinks, [mid]:{...(s.customDrinks[mid]||{name:'',price:0}), name} } })); }
   setCustomPrice(mid,price){ this.setState(s=>({ customDrinks:{...s.customDrinks, [mid]:{...(s.customDrinks[mid]||{name:'',price:0}), price:parseFloat(price)||0} } })); }
   payNext(){ this.setState(s=>({ payerIndex:(s.payerIndex+1)%this.members.length })); }
   setPayer(idx){ this.setState({ payerIndex:idx }); }
-  removeRound(id){ this.setState(s=>({ rounds:s.rounds.filter(r=>r.id!==id) })); }
+  removeRound(id){
+    this.setState(s=>({ rounds:s.rounds.filter(r=>r.id!==id) }));
+    if(this.state.sheetUrl) this.pushRemoveRound(id);
+  }
   setAddMid(mid){ this.setState(s=>({ addMid:s.addMid===mid?null:mid })); }
   setAddReason(r){ this.setState(s=>({ addReason:s.addReason===r?null:r })); }
   setAddReasonDraft(v){ this.setState({ addReason:v }); }
   setAddWhen(w){}
-  addRound(){ const s=this.state; if(!s.addMid||!s.addReason||!s.addReason.trim()) return; this.setState(st=>({ rounds:[...st.rounds,{id:Date.now(),mid:st.addMid,reason:st.addReason.trim(),paid:false}], addMid:null, addReason:null })); }
-  markRoundPaid(id){ this.setState(s=>({ rounds:s.rounds.map(r=>r.id===id?{...r,paid:true}:r) })); }
-  markRoundUnpaid(id){ this.setState(s=>({ rounds:s.rounds.map(r=>r.id===id?{...r,paid:false}:r) })); }
+  addRound(){
+    const s=this.state; if(!s.addMid||!s.addReason||!s.addReason.trim()) return;
+    const mid=s.addMid, reason=s.addReason.trim();
+    this.setState(st=>({ rounds:[...st.rounds,{id:String(Date.now()),mid,reason,paid:false}], addMid:null, addReason:null }));
+    if(this.state.sheetUrl) this.pushAddRound(mid, reason);
+  }
+  markRoundPaid(id){
+    this.setState(s=>({ rounds:s.rounds.map(r=>r.id===id?{...r,paid:true}:r) }));
+    if(this.state.sheetUrl) this.pushRoundStatus(id, true);
+  }
+  markRoundUnpaid(id){
+    this.setState(s=>({ rounds:s.rounds.map(r=>r.id===id?{...r,paid:false}:r) }));
+    if(this.state.sheetUrl) this.pushRoundStatus(id, false);
+  }
 
   // ---- dart x01 & cricket, beliebig viele Spieler ----
   dartPress(k){
@@ -826,7 +902,7 @@ class Component extends DCLogic {
   }
 
   componentDidMount(){
-    if(this.state.sheetUrl) this.fetchSheetHistory();
+    if(this.state.sheetUrl){ this.fetchSheetHistory(); this.fetchAttendance(); this.fetchRounds(); }
   }
 
   renderVals(){
