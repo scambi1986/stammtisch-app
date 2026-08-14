@@ -1382,11 +1382,25 @@ class Component extends DCLogic {
         return { remoteHistory:hist };
       });
     }
-    Object.keys(s.attendance).forEach(mid=>{
-      if(s.attendance[mid]==='yes'){
-        this.attendanceHistory = [...this.attendanceHistory.filter(e=>!(e.date===today&&e.mid===mid)), {date:today,mid}];
-      }
+    // Alle Anwesenden (Zusagen + wer eigene Getränke gebucht hat) fest in AttendanceLog schreiben
+    const present = new Set();
+    Object.keys(s.attendance).forEach(mid=>{ if(s.attendance[mid]==='yes') present.add(mid); });
+    Object.keys(s.drinks).forEach(mid=>{
+      if(Object.values(s.drinks[mid]||{}).some(v=>v>0)) present.add(mid);
     });
+    if(hasItems) present.add(me);
+    present.forEach(mid=>{
+      this.attendanceHistory = [...this.attendanceHistory.filter(e=>!(e.date===today&&e.mid===mid)), {date:today,mid}];
+      this.queueAttPending('remove', '!'+mid, today);
+      this.queueAttPending('add', mid, today);
+    });
+    if(present.size){
+      this.setState(st=>({ attendanceLog:this.mergeAttPending(st.attendanceLog) }));
+      [...present].reduce((p,mid)=>p
+        .then(()=>this.pushAttendanceLog('removeAttendanceLog','!'+mid,today,true))
+        .then(()=>this.pushAttendanceLog('addAttendanceLog',mid,today,true)), Promise.resolve())
+        .then(()=>this.fetchAttendanceLog());
+    }
     this.setState(st=>{ const dr={...st.drinks}; delete dr[me]; this.saveLocalTally(dr,st.customDrinks); return { drinks:dr, finishMsg:'Stammtisch abgeschlossen – deine Strichliste ist jetzt in der Statistik.' }; });
   }
 
