@@ -938,41 +938,54 @@ class Component extends DCLogic {
       body:JSON.stringify({ action:'setAttendance', mid, status: val }),
     }).then(()=>this.fetchAttendance()).catch(()=>{});
   }
+  // Lokal vorgenommene Anwesenheits-Änderungen; werden über Sheet-Antworten gelegt,
+  // damit ein zwischenzeitliches Neuladen sie nicht wieder verschluckt.
+  attPending = [];
+  queueAttPending(op, mid, date){
+    this.attPending = this.attPending.filter(p=>!(p.date===date && p.mid===mid));
+    this.attPending.push({ op, mid:String(mid), date:String(date) });
+  }
+  mergeAttPending(rows){
+    let out = rows.map(e=>({ date:String(e.date), mid:String(e.mid) }));
+    this.attPending.forEach(p=>{
+      out = out.filter(e=>!(e.date===p.date && e.mid===p.mid));
+      if(p.op==='add') out.push({ date:p.date, mid:p.mid });
+    });
+    return out;
+  }
   fetchAttendanceLog(){
     const url=this.state.sheetUrl;
     if(!url) return;
     fetch(url+'?action=attendanceLog&_='+Date.now(), { cache:'no-store' })
       .then(r=>r.json())
-      .then(data=>{ if(data && Array.isArray(data.attendanceLog)) this.setState({ attendanceLog:data.attendanceLog }); })
+      .then(data=>{ if(data && Array.isArray(data.attendanceLog)) this.setState({ attendanceLog:this.mergeAttPending(data.attendanceLog) }); })
       .catch(()=>{});
   }
-  pushAttendanceLog(action, mid, date){
+  pushAttendanceLog(action, mid, date, skipFetch){
     const url=this.state.sheetUrl;
     if(!url) return Promise.resolve();
     return fetch(url, {
       method:'POST',
       headers:{ 'Content-Type':'text/plain;charset=utf-8' },
       body: JSON.stringify({ action, mid, date })
-    }).then(()=>this.fetchAttendanceLog()).catch(()=>{});
+    }).then(()=>{ if(!skipFetch) this.fetchAttendanceLog(); }).catch(()=>{});
   }
   adminAddAttendance(){
     const s=this.state;
     if(!s.adminAttMid || !s.adminAttDate) return;
-    const entry={ date:s.adminAttDate, mid:s.adminAttMid };
-    this.setState(st=>({
-      attendanceLog:[...st.attendanceLog.filter(e=>!(e.date===entry.date&&(e.mid===entry.mid||e.mid==='!'+entry.mid))), entry],
-      adminAttMid:null
-    }));
-    this.pushAttendanceLog('removeAttendanceLog', '!'+entry.mid, entry.date)
+    const entry={ date:String(s.adminAttDate), mid:String(s.adminAttMid) };
+    this.queueAttPending('remove', '!'+entry.mid, entry.date);
+    this.queueAttPending('add', entry.mid, entry.date);
+    this.setState(st=>({ attendanceLog:this.mergeAttPending(st.attendanceLog), adminAttMid:null }));
+    this.pushAttendanceLog('removeAttendanceLog', '!'+entry.mid, entry.date, true)
       .then(()=>this.pushAttendanceLog('addAttendanceLog', entry.mid, entry.date));
   }
   adminRemoveAttendance(mid, date, fromDrinks){
     if(!confirm('Anwesenheit wirklich löschen?')) return;
-    this.setState(st=>({
-      attendanceLog:[...st.attendanceLog.filter(e=>!(e.date===date&&e.mid===mid)),
-                     ...(fromDrinks?[{date,mid:'!'+mid}]:[])]
-    }));
-    this.pushAttendanceLog('removeAttendanceLog', mid, date)
+    this.queueAttPending('remove', mid, date);
+    if(fromDrinks) this.queueAttPending('add', '!'+mid, date);
+    this.setState(st=>({ attendanceLog:this.mergeAttPending(st.attendanceLog) }));
+    this.pushAttendanceLog('removeAttendanceLog', mid, date, !!fromDrinks)
       .then(()=>{ if(fromDrinks) this.pushAttendanceLog('addAttendanceLog', '!'+mid, date); });
   }
   editSessionDrink(date, did, delta){
