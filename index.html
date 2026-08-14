@@ -180,6 +180,27 @@
       </div>
       </sc-if>
 
+      <!-- ============ ADMIN: PASSWORT ============ -->
+      <sc-if value="{{ isAdminLocked }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slidein .25s ease;padding-bottom:24px">
+        <div style="padding:18px 20px 14px;background:#3a2c1e;color:#f3e8d2">
+          <button onClick="{{ goHome }}" style="background:none;border:none;padding:0 0 8px;cursor:pointer;font:600 13px 'Work Sans';color:#e6b88a">← Zurück</button>
+          <div style="font:600 10px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#c9a877">Admin-Bereich</div>
+          <div style="font:600 22px 'Oswald';margin-top:2px">🔒 Passwort erforderlich</div>
+        </div>
+        <div style="padding:20px 16px">
+          <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:14px;padding:16px">
+            <div style="font:600 12px 'Work Sans';color:#5c4c38;margin-bottom:9px">Passwort</div>
+            <input type="password" value="{{ adminPw }}" onChange="{{ setAdminPw }}" onKeyDown="{{ adminPwKeyDown }}" placeholder="••••••" style="width:100%;border:1px solid #e4d5b8;border-radius:11px;padding:11px;font:500 15px 'Work Sans';margin-bottom:10px" />
+            <button onClick="{{ unlockAdmin }}" style="width:100%;border:none;background:#2f5d3f;color:#f3e8d2;font:600 14px 'Work Sans';padding:12px;border-radius:11px;cursor:pointer">Entsperren</button>
+            <sc-if value="{{ adminPwError }}" hint-placeholder-val="{{ false }}">
+            <div style="font:600 12px 'Work Sans';color:#a8322a;margin-top:10px">Falsches Passwort.</div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
       <!-- ============ ADMIN (nur Sven) ============ -->
       <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
       <div style="animation:slidein .25s ease;padding-bottom:24px">
@@ -215,7 +236,7 @@
             </div>
           </div>
 
-          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:22px 4px 10px">Anwesenheit</div>
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:22px 4px 10px">Anwesenheit · letzte 3 Stammtische</div>
           <sc-if value="{{ hasAdminAttDates }}" hint-placeholder-val="{{ true }}">
           <sc-for list="{{ adminAttDates }}" as="t" hint-placeholder-count="2">
             <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:14px;padding:11px 12px;margin-bottom:8px">
@@ -257,7 +278,12 @@
                 </button>
               </sc-for>
             </div>
-            <button onClick="{{ adminAddAttendance }}" style="width:100%;border:none;background:#2f5d3f;color:#f3e8d2;font:600 13px 'Work Sans';padding:10px;border-radius:11px;cursor:pointer;opacity:{{ adminAttAddOpacity }}">+ Als anwesend eintragen</button>
+            <div style="display:flex;align-items:center;gap:9px">
+              <button onClick="{{ saveAttendanceToSheet }}" style="flex:1;border:none;background:#2f5d3f;color:#f3e8d2;font:600 13px 'Work Sans';padding:10px;border-radius:11px;cursor:pointer;opacity:{{ adminAttAddOpacity }}">💾 Speichern</button>
+              <sc-if value="{{ attSaveMsg }}" hint-placeholder-val="{{ false }}">
+              <div style="font:600 12px 'Work Sans';color:#2f5d3f;white-space:nowrap">{{ attSaveMsg }}</div>
+              </sc-if>
+            </div>
           </div>
 
           <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:22px 4px 10px">Getränke</div>
@@ -841,6 +867,10 @@ class Component extends DCLogic {
     adminAttDate:'',
     boardOpenMid:null,
     adminAttMid:null,
+    adminPw:'',
+    adminPwError:false,
+    adminUnlocked:(()=>{ try{ return sessionStorage.getItem('stammtisch_admin')==='1'; }catch(e){ return false; } })(),
+    attSaveMsg:'',
     finishMsg:'',
   };
 
@@ -1028,6 +1058,35 @@ class Component extends DCLogic {
     }, 4000);
   }
   toggleBoardMember(mid){ this.setState(s=>({ boardOpenMid:s.boardOpenMid===mid?null:mid })); }
+  setAdminPw(v){ this.setState({ adminPw:v, adminPwError:false }); }
+  unlockAdmin(){
+    const pw=(this.props.adminPassword ?? 'hf2026');
+    if(this.state.adminPw===pw){
+      try{ sessionStorage.setItem('stammtisch_admin','1'); }catch(e){}
+      this.setState({ adminUnlocked:true, adminPw:'', adminPwError:false });
+      this.fetchMembers(); this.fetchDrinksList();
+    } else this.setState({ adminPwError:true });
+  }
+  // Überträgt alle lokal vorgenommenen Anwesenheits-Änderungen ins Sheet
+  saveAttendanceToSheet(){
+    const url=this.state.sheetUrl;
+    const s=this.state;
+    if(s.adminAttMid && s.adminAttDate){
+      const entry={ date:String(s.adminAttDate), mid:String(s.adminAttMid) };
+      this.queueAttPending('remove', '!'+entry.mid, entry.date);
+      this.queueAttPending('add', entry.mid, entry.date);
+      this.setState(st=>({ attendanceLog:this.mergeAttPending(st.attendanceLog), adminAttMid:null }));
+    }
+    if(!url){ this.setState({ attSaveMsg:'Kein Sheet verbunden' }); return; }
+    const ops=this.attPending.slice();
+    if(!ops.length){ this.setState({ attSaveMsg:'Nichts zu speichern' }); setTimeout(()=>this.setState({attSaveMsg:''}),2500); return; }
+    this.setState({ attSaveMsg:'Speichere …' });
+    ops.reduce((p,o)=>p.then(()=>this.pushAttendanceLog(
+      o.op==='add'?'addAttendanceLog':'removeAttendanceLog', o.mid, o.date, true)), Promise.resolve())
+      .then(()=>{ this.fetchAttendanceLog(); this.setState({ attSaveMsg:'Gespeichert ✓' });
+        setTimeout(()=>this.setState({attSaveMsg:''}),2500); })
+      .catch(()=>this.setState({ attSaveMsg:'Fehler beim Speichern' }));
+  }
   setAdminAttDate(date){ this.setState({ adminAttDate:date }); }
   setAdminAttMid(mid){ this.setState(s=>({ adminAttMid:s.adminAttMid===mid?null:mid })); }
   fetchRounds(){
@@ -1554,7 +1613,7 @@ class Component extends DCLogic {
       if(!Object.keys(attByDate_[e.date]).length) delete attByDate_[e.date]; } });
     const monNamesA=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
     const fmtDate_=ds=>{ const d=parseDate_(ds); return d.getDate()+'. '+monNamesA[d.getMonth()]+' '+d.getFullYear(); };
-    const adminAttDates = Object.keys(attByDate_).sort((a,b)=>b.localeCompare(a)).map(date=>({
+    const adminAttDates = Object.keys(attByDate_).sort((a,b)=>b.localeCompare(a)).slice(0,3).map(date=>({
       date, dateLabel:fmtDate_(date),
       people:Object.keys(attByDate_[date]).map(mid=>{
         const mm=M.find(x=>x.id===mid);
@@ -1602,7 +1661,13 @@ class Component extends DCLogic {
       clock:this.clock,
       isHome:s.screen==='home',isTermin:s.screen==='termin',isGetraenke:s.screen==='getraenke',
       isRunde:s.screen==='runde',isDart:s.screen==='dart',isStats:s.screen==='stats',isInfo:s.screen==='info',
-      isAdmin:s.screen==='admin' && isAdminUser, isAdminUser, goAdmin:this.go('admin'),
+      isAdmin:s.screen==='admin' && isAdminUser && s.adminUnlocked, isAdminUser, goAdmin:this.go('admin'),
+      isAdminLocked:s.screen==='admin' && isAdminUser && !s.adminUnlocked,
+      adminPw:s.adminPw, adminPwError:s.adminPwError,
+      setAdminPw:e=>this.setAdminPw(e.target.value),
+      adminPwKeyDown:e=>{ if(e.key==='Enter') this.unlockAdmin(); },
+      unlockAdmin:()=>this.unlockAdmin(),
+      attSaveMsg:s.attSaveMsg, saveAttendanceToSheet:()=>this.saveAttendanceToSheet(),
       adminMembersView, adminDrinksView,
       adminMemberName:s.adminMemberDraft.name, adminMemberColor:s.adminMemberDraft.color, adminMemberIcon:s.adminMemberDraft.dogIcon,
       setAdminMemberName:e=>this.setAdminMemberDraft('name',e.target.value),
