@@ -180,6 +180,68 @@
       </div>
       </sc-if>
 
+      <!-- ============ QUIZ ============ -->
+      <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:slidein .25s ease;padding-bottom:24px">
+        <div style="padding:18px 20px 14px;background:#3a2c1e;color:#f3e8d2">
+          <button onClick="{{ goHome }}" style="background:none;border:none;padding:0 0 8px;cursor:pointer;font:600 13px 'Work Sans';color:#e6b88a">← Zurück</button>
+          <div style="font:600 10px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#c9a877">Stammtisch-Quiz</div>
+          <div style="font:600 22px 'Oswald';margin-top:2px">🧠 {{ quizHeadline }}</div>
+        </div>
+
+        <div style="padding:16px">
+          <sc-if value="{{ quizEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff8ec;border:1px dashed #e4d5b8;border-radius:14px;padding:18px;text-align:center;font:500 13px 'Work Sans';color:#8a7860">{{ quizEmptyMsg }}</div>
+          </sc-if>
+
+          <sc-if value="{{ quizPlaying }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="flex:1;height:7px;background:#e4d5b8;border-radius:4px;overflow:hidden">
+              <div style="height:100%;width:{{ quizProgress }};background:#2f5d3f;border-radius:4px;transition:width .3s ease"></div>
+            </div>
+            <div style="font:600 12px 'Work Sans';color:#8a7860;white-space:nowrap">{{ quizCounter }}</div>
+          </div>
+          <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:16px;margin-bottom:12px">
+            <div style="font:600 17px 'Work Sans';color:#2b2016;line-height:1.35;text-wrap:pretty">{{ quizQuestion }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ quizOptions }}" as="o" hint-placeholder-count="4">
+              <button onClick="{{ o.pick }}" style="display:flex;align-items:center;gap:11px;text-align:left;background:{{ o.bg }};border:1.5px solid {{ o.border }};border-radius:14px;padding:13px 14px;cursor:pointer">
+                <span style="flex:none;width:26px;height:26px;border-radius:50%;background:{{ o.badgeBg }};color:{{ o.badgeColor }};display:flex;align-items:center;justify-content:center;font:700 12px 'Oswald'">{{ o.letter }}</span>
+                <span style="flex:1;font:500 14px 'Work Sans';color:{{ o.color }};line-height:1.3">{{ o.label }}</span>
+                <span style="font:700 15px 'Work Sans';color:{{ o.markColor }}">{{ o.mark }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ quizAnswered }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ quizNext }}" style="width:100%;margin-top:13px;border:none;background:#2f5d3f;color:#f3e8d2;font:600 14px 'Work Sans';padding:13px;border-radius:12px;cursor:pointer">{{ quizNextLabel }}</button>
+          </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ quizResult }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:16px;padding:20px;text-align:center">
+            <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860">Auswertung</div>
+            <div style="font:700 46px 'Oswald';color:#2f5d3f;margin:4px 0 0">{{ quizScore }}</div>
+            <div style="font:500 13px 'Work Sans';color:#5c4c38">{{ quizScoreSub }}</div>
+            <div style="font:600 15px 'Work Sans';color:#2b2016;margin-top:12px">{{ quizVerdict }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+            <sc-for list="{{ quizReview }}" as="r" hint-placeholder-count="5">
+              <div style="background:#fff8ec;border:1px solid {{ r.border }};border-left:4px solid {{ r.border }};border-radius:12px;padding:11px 12px">
+                <div style="font:600 13px 'Work Sans';color:#2b2016;line-height:1.35">{{ r.mark }} {{ r.q }}</div>
+                <div style="font:500 12px 'Work Sans';color:#5c4c38;margin-top:4px">Richtig: {{ r.correct }}</div>
+                <sc-if value="{{ r.showPicked }}" hint-placeholder-val="{{ false }}">
+                <div style="font:500 12px 'Work Sans';color:#a8322a;margin-top:2px">Deine Antwort: {{ r.picked }}</div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <button onClick="{{ quizRestart }}" style="width:100%;margin-top:13px;border:none;background:#2f5d3f;color:#f3e8d2;font:600 14px 'Work Sans';padding:13px;border-radius:12px;cursor:pointer">🎲 Neue Runde</button>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
       <!-- ============ ADMIN: PASSWORT ============ -->
       <sc-if value="{{ isAdminLocked }}" hint-placeholder-val="{{ false }}">
       <div style="animation:slidein .25s ease;padding-bottom:24px">
@@ -871,6 +933,12 @@ class Component extends DCLogic {
     adminPwError:false,
     adminUnlocked:(()=>{ try{ return sessionStorage.getItem('stammtisch_admin')==='1'; }catch(e){ return false; } })(),
     attSaveMsg:'',
+    quizAll:null,
+    quizRound:[],
+    quizIdx:0,
+    quizPicked:null,
+    quizAnswers:[],
+    quizDone:false,
     finishMsg:'',
   };
 
@@ -1058,6 +1126,82 @@ class Component extends DCLogic {
     }, 4000);
   }
   toggleBoardMember(mid){ this.setState(s=>({ boardOpenMid:s.boardOpenMid===mid?null:mid })); }
+  quizVals(){
+    const s=this.state;
+    const L=['A','B','C','D','E'];
+    const round=s.quizRound, q=round[s.quizIdx], picked=s.quizPicked;
+    const answered = picked!==null;
+    const quizOptions = (q?q.options:[]).map((label,i)=>{
+      const isCorrect=i===q.correct, isPicked=i===picked;
+      let bg='#fff8ec', border='#e4d5b8', color='#2b2016', badgeBg='#e4d5b8', badgeColor='#5c4c38', mark='', markColor='#2f5d3f';
+      if(answered && isCorrect){ bg='#eaf1ec'; border='#2f5d3f'; badgeBg='#2f5d3f'; badgeColor='#fff'; mark='✓'; }
+      else if(answered && isPicked){ bg='#f7ecea'; border='#a8322a'; badgeBg='#a8322a'; badgeColor='#fff'; mark='✗'; markColor='#a8322a'; }
+      else if(answered){ color='#8a7860'; }
+      return { label, letter:L[i]||'?', bg, border, color, badgeBg, badgeColor, mark, markColor, pick:()=>this.pickQuizAnswer(i) };
+    });
+    const correctCount = s.quizAnswers.filter(a=>a.picked===a.correct).length;
+    const total = s.quizAnswers.length || round.length;
+    const verdict = !total ? '' :
+      correctCount===total ? 'Alles richtig – die nächste Runde geht auf die anderen.' :
+      correctCount>=Math.ceil(total*0.6) ? 'Solide Runde.' :
+      correctCount>0 ? 'Da ist noch Luft nach oben.' : 'Nächstes Mal wird’s besser.';
+    return {
+      quizHeadline: s.quizDone ? 'Runde ausgewertet' : 'Fünf Fragen, gewürfelt',
+      quizPlaying: !!q && !s.quizDone,
+      quizResult: s.quizDone,
+      quizEmpty: s.quizAll!==null && s.quizAll.length===0,
+      quizEmptyMsg: this.state.sheetUrl ? 'Im Sheet-Reiter „Quiz“ stehen noch keine Fragen.' : 'Kein Sheet verbunden.',
+      quizQuestion: q?q.q:'',
+      quizOptions, quizAnswered:answered,
+      quizNextLabel: s.quizIdx+1>=round.length ? 'Auswertung ansehen' : 'Nächste Frage',
+      quizCounter: (Math.min(s.quizIdx+1, round.length||1))+' / '+(round.length||0),
+      quizProgress: Math.round(((s.quizIdx+(answered?1:0))/(round.length||1))*100)+'%',
+      quizScore: correctCount+' / '+total,
+      quizScoreSub: 'richtig beantwortet',
+      quizVerdict: verdict,
+      quizReview: s.quizAnswers.map(a=>({
+        q:a.q, mark:a.picked===a.correct?'✓':'✗',
+        border:a.picked===a.correct?'#2f5d3f':'#a8322a',
+        correct:a.options[a.correct],
+        picked:a.options[a.picked],
+        showPicked:a.picked!==a.correct,
+      })),
+      quizNext:()=>this.quizNext(),
+      quizRestart:()=>this.startQuizRound(),
+    };
+  }
+  // -- Quiz --
+  fetchQuiz(){
+    const url=this.state.sheetUrl;
+    if(!url){ this.setState({ quizAll:[] }); return; }
+    fetch(url+'?action=quiz&_='+Date.now(), { cache:'no-store' })
+      .then(r=>r.json())
+      .then(data=>{
+        const all = (data && Array.isArray(data.quiz)) ? data.quiz : [];
+        this.setState({ quizAll:all });
+        if(all.length && !this.state.quizRound.length) this.startQuizRound(all);
+      })
+      .catch(()=>this.setState({ quizAll:[] }));
+  }
+  startQuizRound(pool){
+    const all = pool || this.state.quizAll || [];
+    const shuffled = all.slice();
+    for(let i=shuffled.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]; }
+    this.setState({ quizRound:shuffled.slice(0,5), quizIdx:0, quizPicked:null, quizAnswers:[], quizDone:false });
+  }
+  pickQuizAnswer(i){
+    const s=this.state;
+    if(s.quizPicked!==null) return;
+    const q=s.quizRound[s.quizIdx];
+    if(!q) return;
+    this.setState({ quizPicked:i, quizAnswers:[...s.quizAnswers, { q:q.q, options:q.options, correct:q.correct, picked:i }] });
+  }
+  quizNext(){
+    this.setState(s=>{
+      if(s.quizIdx+1 >= s.quizRound.length) return { quizDone:true, quizPicked:null };
+      return { quizIdx:s.quizIdx+1, quizPicked:null };
+    });
+  }
   setAdminPw(v){ this.setState({ adminPw:v, adminPwError:false }); }
   unlockAdmin(){
     const pw=(this.props.adminPassword ?? 'hf2026');
@@ -1217,6 +1361,10 @@ class Component extends DCLogic {
     if(screen==='home' || screen==='runde'){ this.fetchRounds(); this.fetchAttendance(); }
     if(screen==='termin') this.fetchAttendance();
     if(screen==='admin'){ this.fetchMembers(); this.fetchDrinksList(); }
+    if(screen==='quiz'){
+      if(this.state.quizAll===null) this.fetchQuiz();
+      else if(!this.state.quizRound.length) this.startQuizRound();
+    }
   }; }
 
   // ---- next Stammtisch: first Wednesday not in the past ----
@@ -1418,7 +1566,7 @@ class Component extends DCLogic {
         id:m.id,name:m.name,color:m.color,initials:this.initials(m.name),dogIcon:m.dogIcon,pick:()=>this.selectUser(m.id),
       }));
       return { isPicker:true, hasUser:false, clock:this.clock, pickerMembers,
-        isHome:false,isTermin:false,isGetraenke:false,isRunde:false,isDart:false,isStats:false,isInfo:false,isAdmin:false };
+        isHome:false,isTermin:false,isGetraenke:false,isRunde:false,isDart:false,isStats:false,isInfo:false,isAdmin:false,isAdminLocked:false,isQuiz:false };
     }
     const att=s.attendance;
     const isYes=id=>att[id]==='yes', isNo=id=>att[id]==='no';
@@ -1439,6 +1587,7 @@ class Component extends DCLogic {
       {icon:'💶',title:'Wer zahlt?',sub:'Nächste Runde',bg:'#f7f0da',go:this.go('runde')},
       {icon:'🎯',title:'Dart',sub:'501 & Cricket',bg:'#eceaf0',go:this.go('dart')},
       {icon:'📊',title:'Statistik',sub:'Bier & Ausgaben',bg:'#eaf1ec',go:this.go('stats')},
+      {icon:'🧠',title:'Quiz',sub:'5 Fragen pro Runde',bg:'#f0ece4',go:this.go('quiz')},
     ];
     if(s.currentUser===(this.props.adminUserId ?? 'sven')){
       tiles.push({icon:'🛠️',title:'Admin',sub:'Mitglieder, Anwesenheit & Getränke',bg:'#f3e6e6',go:this.go('admin')});
@@ -1675,6 +1824,7 @@ class Component extends DCLogic {
       clock:this.clock,
       isHome:s.screen==='home',isTermin:s.screen==='termin',isGetraenke:s.screen==='getraenke',
       isRunde:s.screen==='runde',isDart:s.screen==='dart',isStats:s.screen==='stats',isInfo:s.screen==='info',
+      isQuiz:s.screen==='quiz', ...this.quizVals(),
       isAdmin:s.screen==='admin' && isAdminUser && s.adminUnlocked, isAdminUser, goAdmin:this.go('admin'),
       isAdminLocked:s.screen==='admin' && isAdminUser && !s.adminUnlocked,
       adminPw:s.adminPw, adminPwError:s.adminPwError,
