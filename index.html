@@ -172,7 +172,7 @@
           <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:22px 4px 10px">Verwaltung</div>
           <button onClick="{{ goAdmin }}" style="width:100%;display:flex;align-items:center;gap:12px;background:#3a2c1e;border:none;border-radius:16px;padding:15px 16px;cursor:pointer;text-align:left">
             <span style="font-size:22px">🛠️</span>
-            <span style="flex:1"><span style="display:block;font:600 15px 'Oswald';color:#f3e8d2">Admin-Bereich</span><span style="display:block;font:500 12px 'Work Sans';color:#c9a877">Mitglieder & Getränke verwalten</span></span>
+            <span style="flex:1"><span style="display:block;font:600 15px 'Oswald';color:#f3e8d2">Admin-Bereich</span><span style="display:block;font:500 12px 'Work Sans';color:#c9a877">Mitglieder, Anwesenheit & Getränke</span></span>
             <span style="font:700 18px 'Oswald';color:#c9a877">→</span>
           </button>
           </sc-if>
@@ -186,7 +186,7 @@
         <div style="padding:18px 20px 14px;background:#3a2c1e;color:#f3e8d2">
           <button onClick="{{ goHome }}" style="background:none;border:none;padding:0 0 8px;cursor:pointer;font:600 13px 'Work Sans';color:#e6b88a">← Zurück</button>
           <div style="font:600 10px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#c9a877">Admin-Bereich</div>
-          <div style="font:600 22px 'Oswald';margin-top:2px">🛠️ Mitglieder & Getränke</div>
+          <div style="font:600 22px 'Oswald';margin-top:2px">🛠️ Mitglieder, Anwesenheit & Getränke</div>
         </div>
 
         <div style="padding:16px">
@@ -215,7 +215,58 @@
             </div>
           </div>
 
+          <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:22px 4px 10px">Anwesenheit</div>
+          <sc-if value="{{ hasAdminAttDates }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ adminAttDates }}" as="t" hint-placeholder-count="2">
+            <div style="background:#fff8ec;border:1px solid #e4d5b8;border-radius:14px;padding:11px 12px;margin-bottom:8px">
+              <div style="font:600 13px 'Work Sans';color:#2b2016;margin-bottom:9px">{{ t.dateLabel }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:7px">
+                <sc-for list="{{ t.people }}" as="p" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #e4d5b8;border-radius:20px;padding:5px 9px 5px 5px">
+                    <div style="width:24px;height:24px;border-radius:50%;background:{{ p.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 10px 'Oswald';flex:none">{{ p.initials }}</div>
+                    <span style="font:600 12px 'Work Sans';color:#2b2016">{{ p.name }}</span>
+                    <sc-if value="{{ p.canRemove }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ p.remove }}" style="width:20px;height:20px;border-radius:6px;border:none;background:#f3e8d2;color:#a13d2d;font-size:12px;cursor:pointer;flex:none;padding:0">✕</button>
+                    </sc-if>
+                    <sc-if value="{{ p.fromDrinks }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:11px" title="aus Getränkeliste">🍺</span>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          </sc-if>
+          <sc-if value="{{ adminAttDatesEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff8ec;border:1px dashed #e4d5b8;border-radius:14px;padding:16px;text-align:center;font:500 13px 'Work Sans';color:#8a7860">Noch keine Anwesenheiten erfasst.</div>
+          </sc-if>
+
+          <div style="background:#fff8ec;border:1px dashed #cdbf9f;border-radius:14px;padding:13px;margin-top:10px">
+            <div style="font:600 12px 'Work Sans';color:#5c4c38;margin-bottom:8px">Anwesenheit nachtragen</div>
+            <select value="{{ adminAttDate }}" onChange="{{ setAdminAttDate }}" style="width:100%;border:1px solid #e4d5b8;border-radius:11px;padding:9px 11px;font:500 13px 'Work Sans';margin-bottom:10px;background:#fffdf8;color:#2b2016;-webkit-appearance:none;appearance:none">
+              <option value="">Termin wählen …</option>
+              <sc-for list="{{ pastStammtische }}" as="t" hint-placeholder-count="3">
+                <option value="{{ t.value }}">{{ t.label }}</option>
+              </sc-for>
+            </select>
+            <div style="display:flex;gap:9px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px">
+              <sc-for list="{{ adminAttPickList }}" as="m" hint-placeholder-count="10">
+                <button onClick="{{ m.select }}" style="flex:none;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:52px;padding:0">
+                  <div style="width:38px;height:38px;border-radius:50%;background:{{ m.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Oswald';opacity:{{ m.op }};box-shadow:0 0 0 3px {{ m.ring }}">{{ m.initials }}</div>
+                  <span style="font:500 10px 'Work Sans';color:#5c4c38;white-space:nowrap">{{ m.name }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <button onClick="{{ adminAddAttendance }}" style="width:100%;border:none;background:#2f5d3f;color:#f3e8d2;font:600 13px 'Work Sans';padding:10px;border-radius:11px;cursor:pointer;opacity:{{ adminAttAddOpacity }}">+ Als anwesend eintragen</button>
+          </div>
+
           <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:22px 4px 10px">Getränke</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+            <button onClick="{{ syncMenuPrices }}" style="border:1px solid #cdbf9f;background:#fffdf8;color:#5c4c38;font:600 12px 'Work Sans';padding:10px;border-radius:11px;cursor:pointer;text-align:left">Preise aus Getränkekarte übernehmen</button>
+            <sc-if value="{{ hasPriceSyncMsg }}" hint-placeholder-val="{{ false }}">
+              <div style="font:500 11px 'Work Sans';color:#2f5d3f;padding:0 4px">{{ priceSyncMsg }}</div>
+            </sc-if>
+          </div>
           <sc-for list="{{ adminDrinksView }}" as="d" hint-placeholder-count="10">
             <div style="display:flex;align-items:center;gap:10px;background:#fff8ec;border:1px solid #e4d5b8;border-radius:13px;padding:9px 11px;margin-bottom:8px">
               <div style="flex:1;min-width:0"><div style="font:600 14px 'Work Sans';color:#2b2016">{{ d.label }}</div><div style="font:500 11px 'Work Sans';color:#8a7860">{{ d.priceLabel }} · {{ d.beerLabel }}</div></div>
@@ -529,6 +580,9 @@
               <button onClick="{{ t.select }}" style="flex:1;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.color }};font:600 13px 'Work Sans';padding:11px 4px;border-radius:11px;cursor:pointer">{{ t.label }}</button>
             </sc-for>
           </div>
+          <sc-if value="{{ liveTallyOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff3d0;border:1px solid #e8c65f;border-radius:12px;padding:10px 12px;margin-bottom:12px;font:500 12px 'Work Sans';color:#6b5220;text-wrap:pretty">Deine laufende Strichliste ({{ liveTallyCount }} Getränke) zählt erst mit, wenn du den Stammtisch abschließt.</div>
+          </sc-if>
           <div style="display:flex;gap:8px;margin-bottom:16px">
             <sc-for list="{{ statsPeriods }}" as="p" hint-placeholder-count="3">
               <button onClick="{{ p.select }}" style="flex:1;border:1px solid {{ p.border }};background:{{ p.bg }};color:{{ p.color }};font:600 12px 'Work Sans';padding:10px 4px;border-radius:11px;cursor:pointer">{{ p.label }}</button>
@@ -573,11 +627,27 @@
               <sc-if value="{{ s.isOpen }}" hint-placeholder-val="{{ false }}">
               <div style="padding:0 13px 12px;display:flex;flex-direction:column;gap:5px">
                 <sc-for list="{{ s.items }}" as="it" hint-placeholder-count="2">
-                  <div style="display:flex;justify-content:space-between;font:500 12px 'Work Sans';color:#5c4c38;background:#f3e8d2;border-radius:8px;padding:5px 9px">
-                    <span>{{ it.label }}</span>
-                    <span style="font-weight:600">{{ it.count }}×</span>
+                  <div style="display:flex;align-items:center;gap:8px;font:500 12px 'Work Sans';color:#5c4c38;background:#f3e8d2;border-radius:8px;padding:5px 9px">
+                    <span style="flex:1;min-width:0">{{ it.label }}</span>
+                    <sc-if value="{{ it.editable }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ it.minus }}" style="width:24px;height:24px;border-radius:7px;border:1px solid #d8c7a4;background:#fff;color:#7a6a54;font:600 14px 'Work Sans';cursor:pointer;padding:0;flex:none">−</button>
+                    </sc-if>
+                    <span style="font-weight:600;min-width:26px;text-align:right">{{ it.count }}×</span>
+                    <sc-if value="{{ it.editable }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ it.plus }}" style="width:24px;height:24px;border-radius:7px;border:none;background:#2f5d3f;color:#f3e8d2;font:600 14px 'Work Sans';cursor:pointer;padding:0;flex:none">+</button>
+                    </sc-if>
                   </div>
                 </sc-for>
+                <sc-if value="{{ s.hasAddOptions }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+                  <sc-for list="{{ s.addOptions }}" as="o" hint-placeholder-count="3">
+                    <button onClick="{{ o.add }}" style="border:1px dashed #cdbf9f;background:#fffdf8;color:#7a6a54;font:500 11px 'Work Sans';padding:5px 9px;border-radius:20px;cursor:pointer">+ {{ o.label }}</button>
+                  </sc-for>
+                </div>
+                </sc-if>
+                <sc-if value="{{ s.notEditable }}" hint-placeholder-val="{{ false }}">
+                <div style="font:500 11px 'Work Sans';color:#a3907a;margin-top:4px">Nur der letzte Termin lässt sich noch ändern.</div>
+                </sc-if>
               </div>
               </sc-if>
             </div>
@@ -588,12 +658,29 @@
           <div style="font:600 11px 'Work Sans';letter-spacing:2px;text-transform:uppercase;color:#8a7860;margin:6px 4px 10px">Bier-Rangliste {{ statsPeriodLabel }}</div>
           <sc-if value="{{ hasLeaderboard }}" hint-placeholder-val="{{ true }}">
           <sc-for list="{{ leaderboard }}" as="r" hint-placeholder-count="6">
-            <div style="display:flex;align-items:center;gap:11px;background:{{ r.rowBg }};border:1px solid {{ r.rowBorder }};border-radius:14px;padding:10px 13px;margin-bottom:8px">
-              <div style="font:700 15px 'Oswald';color:#b0997a;width:20px">{{ r.rank }}</div>
-              <div style="width:32px;height:32px;border-radius:50%;background:{{ r.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Oswald'">{{ r.initials }}</div>
-              <div style="flex:1;font:600 14px 'Work Sans';color:#2b2016">{{ r.name }}</div>
-              <div style="font:600 13px 'Work Sans';color:#8a7860">{{ r.count }}×</div>
-              <div style="font:700 14px 'Oswald';color:#7a3b12;min-width:64px;text-align:right">{{ r.cost }}</div>
+            <div style="background:{{ r.rowBg }};border:1px solid {{ r.rowBorder }};border-radius:14px;margin-bottom:8px;overflow:hidden">
+              <div onClick="{{ r.toggle }}" style="display:flex;align-items:center;gap:11px;padding:10px 13px;cursor:pointer">
+                <div style="font:700 15px 'Oswald';color:#b0997a;width:20px">{{ r.rank }}</div>
+                <div style="width:32px;height:32px;border-radius:50%;background:{{ r.color }};color:#fff;display:flex;align-items:center;justify-content:center;font:700 13px 'Oswald'">{{ r.initials }}</div>
+                <div style="flex:1;min-width:0;display:flex;align-items:center;gap:5px">
+                  <span style="font:600 14px 'Work Sans';color:#2b2016">{{ r.name }}</span>
+                  <span style="font-size:10px;color:#b0997a">{{ r.chevron }}</span>
+                </div>
+                <div style="font:600 13px 'Work Sans';color:#8a7860">{{ r.count }}×</div>
+                <div style="font:700 14px 'Oswald';color:#7a3b12;min-width:64px;text-align:right">{{ r.cost }}</div>
+              </div>
+              <sc-if value="{{ r.open }}" hint-placeholder-val="{{ false }}">
+              <div style="border-top:1px dashed #e4d5b8;padding:10px 13px 12px">
+                <div style="font:600 10px 'Work Sans';letter-spacing:1.5px;text-transform:uppercase;color:#a3907a;margin-bottom:8px">{{ r.sessionsLabel }}</div>
+                <sc-for list="{{ r.detail }}" as="d" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:baseline;gap:8px;padding:4px 0">
+                    <span style="flex:1;font:500 13px 'Work Sans';color:#5c4c38">{{ d.label }}</span>
+                    <span style="font:600 13px 'Work Sans';color:#2b2016">{{ d.count }}</span>
+                    <span style="font:600 12px 'Oswald';color:#7a3b12;min-width:58px;text-align:right">{{ d.sum }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              </sc-if>
             </div>
           </sc-for>
           </sc-if>
@@ -655,17 +742,33 @@ class Component extends DCLogic {
     { id:'sven', name:'Sven', color:'#8a6d1e', dogIcon:'🦮' },
     { id:'thorbjoern', name:'Thorbjörn', color:'#a13d2d', dogIcon:'🐕‍🦺' },
   ];
+  // Erste Mittwoche der Vergangenheit (Termine, für die nachgepflegt werden kann)
+  pastStammtische = (() => {
+    const t = new Date(); t.setHours(0,0,0,0);
+    const fw = (y,m)=>{ const d=new Date(y,m,1); return new Date(y,m,1+((3-d.getDay()+7)%7)); };
+    const wd=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    const out=[];
+    for (let i=0;i<36;i++){
+      const d = fw(t.getFullYear(), t.getMonth()-i);
+      if (d > t) continue;
+      const p = n=>String(n).padStart(2,'0');
+      out.push({ value:d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),
+                 label:'Mi, '+d.getDate()+'. '+wd[d.getMonth()]+' '+d.getFullYear() });
+      if (out.length>=3) break;
+    }
+    return out;
+  })();
   drinksList = [
-    { id:'kh', label:'Kleines Helles (Erdinger)', price:3.80, beer:true },
-    { id:'gh', label:'Großes Helles (Erdinger)', price:5.50, beer:true },
-    { id:'pu3', label:'Pilsner Urquell 0,3', price:3.80, beer:true },
-    { id:'pu5', label:'Pilsner Urquell 0,5', price:5.50, beer:true },
-    { id:'zw3', label:'Ratsherrn Zwickel 0,3', price:4.00, beer:true },
-    { id:'zw5', label:'Ratsherrn Zwickel 0,5', price:5.80, beer:true },
-    { id:'wz', label:'Weizen (Erdinger Hell)', price:5.50, beer:true },
-    { id:'gu', label:'Guinness 0,4', price:5.50, beer:true },
-    { id:'pe', label:'Peroni', price:3.80, beer:true },
-    { id:'af', label:'Alkoholfrei (Erdinger)', price:5.50 },
+    { id:'kh', label:'Kleines Helles (Erdinger)', price:3.90, beer:true },
+    { id:'gh', label:'Großes Helles (Erdinger)', price:5.60, beer:true },
+    { id:'pu3', label:'Pilsner Urquell 0,3', price:3.90, beer:true },
+    { id:'pu5', label:'Pilsner Urquell 0,5', price:5.60, beer:true },
+    { id:'zw3', label:'Ratsherrn Zwickel 0,3', price:4.10, beer:true },
+    { id:'zw5', label:'Ratsherrn Zwickel 0,5', price:5.90, beer:true },
+    { id:'wz', label:'Weizen (Erdinger Hell)', price:5.60, beer:true },
+    { id:'gu', label:'Guinness 0,4', price:5.60, beer:true },
+    { id:'pe', label:'Peroni', price:3.90, beer:true },
+    { id:'af', label:'Alkoholfrei (Erdinger)', price:5.60 },
     { id:'ta', label:'Tarifa', price:3.00 },
   ];
   // Beispiel-Historie vergangener Stammtische (Platzhalter, bis das Google Sheet angebunden ist)
@@ -714,6 +817,7 @@ class Component extends DCLogic {
     adminMemberDraft:{name:'',color:'#2f5d3f',dogIcon:'🐕'},
     adminEditDrinkId:null,
     adminDrinkDraft:{label:'',price:'',beer:false},
+    priceSyncMsg:'',
     addMid:null,
     addReason:null,
     dartMode:'501',
@@ -733,6 +837,10 @@ class Component extends DCLogic {
     statsView:'me',
     openSessionKey:null,
     customDrinks:{},
+    attendanceLog:[],
+    adminAttDate:'',
+    boardOpenMid:null,
+    adminAttMid:null,
     finishMsg:'',
   };
 
@@ -779,17 +887,37 @@ class Component extends DCLogic {
     this.setState({ sheetStatus:'loading' });
     fetch(url+'?action=history&_='+Date.now(), { cache:'no-store' })
       .then(r=>r.json())
-      .then(data=>this.setState({ remoteHistory: Array.isArray(data.history)?data.history:[], sheetStatus:'ok' }))
+      .then(data=>{
+        const raw = Array.isArray(data.history)?data.history:[];
+        const merged = {};
+        raw.forEach(e=>{
+          const date = this.stammtischDateOf(e.date); const key = date+'|'+e.mid;
+          if(!merged[key]) merged[key] = { date, mid:e.mid, items:{} };
+          Object.entries(e.items||{}).forEach(([k,n])=>{ merged[key].items[k]=(Number(merged[key].items[k])||0)+(Number(n)||0); });
+        });
+        this.setState({ remoteHistory: Object.values(merged), sheetStatus:'ok' });
+      })
       .catch(()=>this.setState({ sheetStatus:'error' }));
   }
   pushDrinkToSheet(mid, did, delta, dateStr){
     const url=this.state.sheetUrl;
     if(!url) return;
-    fetch(url, {
+    const known = this.getDrinksList().find(d=>d.id===did || d.label===did);
+    if(known) did = known.label;
+    dateStr = this.stammtischDateOf(dateStr || this.currentStammtischDate());
+    const p = fetch(url, {
       method:'POST',
       headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({ action:'logDrink', mid, did, delta, date:dateStr }),
-    }).then(()=>this.fetchSheetHistory()).catch(()=>{});
+      keepalive:true,
+    });
+    this._pending = (this._pending||0) + 1;
+    p.then(()=>{},()=>{}).then(()=>{
+      this._pending--;
+      clearTimeout(this._histTimer);
+      this._histTimer = setTimeout(()=>{ if(!this._pending) this.fetchSheetHistory(); }, 6000);
+    });
+    return p;
   }
 
   // ---- Zusagen & Runden ebenfalls im Sheet synchronisieren ----
@@ -810,6 +938,85 @@ class Component extends DCLogic {
       body:JSON.stringify({ action:'setAttendance', mid, status: val }),
     }).then(()=>this.fetchAttendance()).catch(()=>{});
   }
+  fetchAttendanceLog(){
+    const url=this.state.sheetUrl;
+    if(!url) return;
+    fetch(url+'?action=attendanceLog&_='+Date.now(), { cache:'no-store' })
+      .then(r=>r.json())
+      .then(data=>{ if(data && Array.isArray(data.attendanceLog)) this.setState({ attendanceLog:data.attendanceLog }); })
+      .catch(()=>{});
+  }
+  pushAttendanceLog(action, mid, date){
+    const url=this.state.sheetUrl;
+    if(!url) return Promise.resolve();
+    return fetch(url, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action, mid, date })
+    }).then(()=>this.fetchAttendanceLog()).catch(()=>{});
+  }
+  adminAddAttendance(){
+    const s=this.state;
+    if(!s.adminAttMid || !s.adminAttDate) return;
+    const entry={ date:s.adminAttDate, mid:s.adminAttMid };
+    this.setState(st=>({
+      attendanceLog:[...st.attendanceLog.filter(e=>!(e.date===entry.date&&(e.mid===entry.mid||e.mid==='!'+entry.mid))), entry],
+      adminAttMid:null
+    }));
+    this.pushAttendanceLog('removeAttendanceLog', '!'+entry.mid, entry.date)
+      .then(()=>this.pushAttendanceLog('addAttendanceLog', entry.mid, entry.date));
+  }
+  adminRemoveAttendance(mid, date, fromDrinks){
+    if(!confirm('Anwesenheit wirklich löschen?')) return;
+    this.setState(st=>({
+      attendanceLog:[...st.attendanceLog.filter(e=>!(e.date===date&&e.mid===mid)),
+                     ...(fromDrinks?[{date,mid:'!'+mid}]:[])]
+    }));
+    this.pushAttendanceLog('removeAttendanceLog', mid, date)
+      .then(()=>{ if(fromDrinks) this.pushAttendanceLog('addAttendanceLog', '!'+mid, date); });
+  }
+  editSessionDrink(date, did, delta){
+    const me=this.state.currentUser;
+    const dr=this.getDrinksList().find(d=>d.id===did||d.label===did);
+    this.setState(st=>{
+      const hist=[...(st.remoteHistory||[])];
+      const i=hist.findIndex(e=>e.date===date&&e.mid===me);
+      if(i<0){ if(delta<=0) return {}; hist.push({date,mid:me,items:{[dr?dr.label:did]:delta}}); }
+      else {
+        const items={...hist[i].items};
+        const key=Object.keys(items).find(k=>k===did||(dr&&(k===dr.id||k===dr.label))) || (dr?dr.label:did);
+        const next=(Number(items[key])||0)+delta;
+        if(next<=0) delete items[key]; else items[key]=next;
+        hist[i]={...hist[i],items};
+      }
+      return { remoteHistory:hist };
+    });
+    const q = this.pushDrinkToSheet(me, did, delta, date);
+    if(delta<0 && q && q.then) q.then(()=>this.ensureSessionItems(date));
+  }
+  // Das Sheet entfernt die Zeile, wenn eine Spalte auf 0 fällt – übrige Werte danach neu setzen
+  ensureSessionItems(date){
+    const me=this.state.currentUser;
+    const e=(this.state.remoteHistory||[]).find(x=>x.date===date&&x.mid===me);
+    if(!e) return;
+    setTimeout(()=>{
+      fetch(this.state.sheetUrl+'?action=history&_='+Date.now(), { cache:'no-store' })
+        .then(r=>r.json())
+        .then(data=>{
+          const raw=(Array.isArray(data.history)?data.history:[])
+            .filter(x=>this.stammtischDateOf(x.date)===date && x.mid===me);
+          const have={};
+          raw.forEach(x=>Object.entries(x.items||{}).forEach(([k,n])=>{ have[k]=(Number(have[k])||0)+(Number(n)||0); }));
+          Object.entries(e.items||{}).forEach(([k,n])=>{
+            const diff=(Number(n)||0)-(Number(have[k])||0);
+            if(diff>0) this.pushDrinkToSheet(me,k,diff,date);
+          });
+        }).catch(()=>{});
+    }, 4000);
+  }
+  toggleBoardMember(mid){ this.setState(s=>({ boardOpenMid:s.boardOpenMid===mid?null:mid })); }
+  setAdminAttDate(date){ this.setState({ adminAttDate:date }); }
+  setAdminAttMid(mid){ this.setState(s=>({ adminAttMid:s.adminAttMid===mid?null:mid })); }
   fetchRounds(){
     const url=this.state.sheetUrl;
     if(!url) return;
@@ -904,6 +1111,25 @@ class Component extends DCLogic {
     fetch(url, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(body) })
       .then(()=>{ this.fetchDrinksList(); this.cancelEditDrink(); }).catch(()=>{});
   }
+  // Preisliste laut Getränkekarte Fasan (Stand August 2026)
+  menuPrices = { kh:3.90, gh:5.60, pu3:3.90, pu5:5.60, zw3:4.10, zw5:5.90, wz:5.60, gu:5.60, pe:3.90, af:5.60 };
+  syncMenuPrices(){
+    const url=this.state.sheetUrl;
+    if(!url){ this.setState({ priceSyncMsg:'Kein Sheet verbunden.' }); return; }
+    const byLabel = {};
+    this.drinksList.forEach(d=>{ if(this.menuPrices[d.id]!=null) byLabel[d.label.toLowerCase()]=this.menuPrices[d.id]; });
+    const target = d => this.menuPrices[d.id] != null ? this.menuPrices[d.id] : byLabel[String(d.label||'').toLowerCase()];
+    const list=this.getDrinksList().filter(d=>target(d)!=null && Number(d.price)!==target(d));
+    if(!list.length){ this.setState({ priceSyncMsg:'Preise sind schon aktuell.' }); return; }
+    this.setState({ priceSyncMsg:'Übertrage '+list.length+' Preise …' });
+    let ok=0, fail=0;
+    list.reduce((p,d)=>p.then(()=>fetch(url,{ method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({ action:'updateDrink', id:d.id, label:d.label, price:target(d), beer:!!d.beer }) })
+      .then(()=>{ok++;},()=>{fail++;})), Promise.resolve())
+      .then(()=>{ this.fetchDrinksList();
+        this.setState({ priceSyncMsg: ok+' Preise übertragen'+(fail?', '+fail+' fehlgeschlagen':'')+'.' }); })
+      .catch(()=>this.setState({ priceSyncMsg:'Übertragung fehlgeschlagen.' }));
+  }
   deleteDrink(id){
     const url=this.state.sheetUrl;
     if(!url) return;
@@ -923,7 +1149,7 @@ class Component extends DCLogic {
 
   // ---- next Stammtisch: first Wednesday not in the past ----
   nextStammtisch(){
-    const t = new Date(2026,6,21);
+    const t = new Date(); t.setHours(0,0,0,0);
     const fw = (y,m)=>{ const d=new Date(y,m,1); return new Date(y,m,1+((3-d.getDay()+7)%7)); };
     let d = fw(t.getFullYear(), t.getMonth());
     if (d < t) d = fw(t.getFullYear(), t.getMonth()+1);
@@ -937,9 +1163,32 @@ class Component extends DCLogic {
     this.setState(s=>({ attendance:{...s.attendance, [id]: newVal } }));
     if(this.state.sheetUrl) this.pushAttendance(id, newVal);
   }
-  addDrink(mid,did,delta){ this.setState(s=>{ const dr={...s.drinks}; const md={...(dr[mid]||{})}; md[did]=Math.max(0,(md[did]||0)+delta); dr[mid]=md; return {drinks:dr}; }); const cd=this.state.customDrinks[mid]; const d=did==='custom'?{label:(cd&&cd.name)||'Weitere'}:this.getDrinksList().find(x=>x.id===did); this.pushDrinkToSheet(mid,d?d.label:did,delta,new Date().toISOString().slice(0,10)); }
-  setCustomName(mid,name){ this.setState(s=>({ customDrinks:{...s.customDrinks, [mid]:{...(s.customDrinks[mid]||{name:'',price:0}), name} } })); }
-  setCustomPrice(mid,price){ this.setState(s=>({ customDrinks:{...s.customDrinks, [mid]:{...(s.customDrinks[mid]||{name:'',price:0}), price:parseFloat(price)||0} } })); }
+  addDrink(mid,did,delta){ this.setState(s=>{ const dr={...s.drinks}; const md={...(dr[mid]||{})}; md[did]=Math.max(0,(md[did]||0)+delta); dr[mid]=md; this.saveLocalTally(dr,s.customDrinks); return {drinks:dr}; }); const cd=this.state.customDrinks[mid]; const d=did==='custom'?{label:(cd&&cd.name)||'Weitere'}:this.getDrinksList().find(x=>x.id===did); }
+  // Termindatum eines Eintrags: immer der erste Mittwoch des jeweiligen Monats
+  stammtischDateOf(ds){
+    const d = (typeof ds==='string' && /^\d{4}-\d{2}-\d{2}/.test(ds)) ? new Date(ds.slice(0,10)+'T00:00:00') : new Date(ds);
+    if(isNaN(d.getTime())) return ds;
+    const fw = (y,m)=>{ const f=new Date(y,m,1); return new Date(y,m,1+((3-f.getDay()+7)%7)); };
+    let w = fw(d.getFullYear(), d.getMonth());
+    if (w > d) w = fw(d.getFullYear(), d.getMonth()-1);
+    const p = n=>String(n).padStart(2,'0');
+    return w.getFullYear()+'-'+p(w.getMonth()+1)+'-'+p(w.getDate());
+  }
+  // Bezugstermin der laufenden Strichliste: der letzte Stammtisch (erster Mittwoch)
+  currentStammtischDate(){ return (this.pastStammtische[0]||{}).value || new Date().toISOString().slice(0,10); }
+  saveLocalTally(drinks,customDrinks){
+    try{ localStorage.setItem('stammtisch_tally', JSON.stringify({stDate:this.currentStammtischDate(),drinks,customDrinks})); }catch(e){}
+  }
+  loadLocalTally(){
+    try{
+      const raw=localStorage.getItem('stammtisch_tally'); if(!raw) return null;
+      const d=JSON.parse(raw);
+      if(d && d.stDate===this.currentStammtischDate()) return d;
+    }catch(e){}
+    return null;
+  }
+  setCustomName(mid,name){ this.setState(s=>{ const cd={...s.customDrinks, [mid]:{...(s.customDrinks[mid]||{name:'',price:0}), name}}; this.saveLocalTally(s.drinks,cd); return {customDrinks:cd}; }); }
+  setCustomPrice(mid,price){ this.setState(s=>{ const cd={...s.customDrinks, [mid]:{...(s.customDrinks[mid]||{name:'',price:0}), price:parseFloat(price)||0}}; this.saveLocalTally(s.drinks,cd); return {customDrinks:cd}; }); }
   payNext(){ this.setState(s=>({ payerIndex:(s.payerIndex+1)%this.getMembers().length })); }
   setPayer(idx){ this.setState({ payerIndex:idx }); }
   removeRound(id){
@@ -1038,22 +1287,41 @@ class Component extends DCLogic {
   // in die Historie uebernommen (Grundlage fuer Statistik & Rangliste), danach Reset fuer's naechste Mal.
   finishStammtisch(){
     const s=this.state;
-    const today = new Date().toISOString().slice(0,10);
+    const today = this.currentStammtischDate();
     const me=s.currentUser;
     const items = s.drinks[me]||{};
-    if(Object.values(items).some(v=>v>0)){
+    const hasItems = Object.values(items).some(v=>v>0);
+    if(hasItems){
       this.drinkHistory = [...this.drinkHistory.filter(e=>!(e.date===today&&e.mid===me)), {date:today,mid:me,items}];
+      const cd=s.customDrinks[me];
+      Object.entries(items).forEach(([did,n])=>{
+        if(!(n>0)) return;
+        const d = did==='custom' ? {label:(cd&&cd.name)||'Weitere'} : this.getDrinksList().find(x=>x.id===did);
+        this.pushDrinkToSheet(me, d?d.label:did, n, today);
+      });
+      this.setState(st=>{
+        const hist=[...(st.remoteHistory||[])];
+        const i=hist.findIndex(e=>e.date===today&&e.mid===me);
+        const merged={...(i>=0?hist[i].items:{})};
+        Object.entries(items).forEach(([did,n])=>{ if(!(n>0)) return;
+          const d=this.getDrinksList().find(x=>x.id===did); const key=d?d.label:did;
+          merged[key]=(Number(merged[key])||0)+n; });
+        if(i>=0) hist[i]={...hist[i],items:merged}; else hist.push({date:today,mid:me,items:merged});
+        return { remoteHistory:hist };
+      });
     }
     Object.keys(s.attendance).forEach(mid=>{
       if(s.attendance[mid]==='yes'){
         this.attendanceHistory = [...this.attendanceHistory.filter(e=>!(e.date===today&&e.mid===mid)), {date:today,mid}];
       }
     });
-    this.setState(st=>{ const dr={...st.drinks}; delete dr[me]; return { drinks:dr, finishMsg:'Stammtisch abgeschlossen – deine Strichliste ist jetzt in der Statistik.' }; });
+    this.setState(st=>{ const dr={...st.drinks}; delete dr[me]; this.saveLocalTally(dr,st.customDrinks); return { drinks:dr, finishMsg:'Stammtisch abgeschlossen – deine Strichliste ist jetzt in der Statistik.' }; });
   }
 
   componentDidMount(){
-    if(this.state.sheetUrl){ this.fetchSheetHistory(); this.fetchAttendance(); this.fetchRounds(); this.fetchMembers(); this.fetchDrinksList(); }
+    const t=this.loadLocalTally();
+    if(t) this.setState({ drinks:t.drinks||{}, customDrinks:t.customDrinks||{} });
+    if(this.state.sheetUrl){ this.fetchSheetHistory(); this.fetchAttendance(); this.fetchRounds(); this.fetchMembers(); this.fetchDrinksList(); this.fetchAttendanceLog(); }
   }
 
   renderVals(){
@@ -1087,7 +1355,7 @@ class Component extends DCLogic {
       {icon:'📊',title:'Statistik',sub:'Bier & Ausgaben',bg:'#eaf1ec',go:this.go('stats')},
     ];
     if(s.currentUser===(this.props.adminUserId ?? 'sven')){
-      tiles.push({icon:'🛠️',title:'Admin',sub:'Mitglieder & Getränke',bg:'#f3e6e6',go:this.go('admin')});
+      tiles.push({icon:'🛠️',title:'Admin',sub:'Mitglieder, Anwesenheit & Getränke',bg:'#f3e6e6',go:this.go('admin')});
     }
 
     // ---- current user ("Du") ----
@@ -1170,13 +1438,20 @@ class Component extends DCLogic {
 
 // Statistik: eigener Bier-/Getraenkekonsum
     const eur2=n=>n.toFixed(2).replace('.',',')+' €';
-    const todayRef = this.nextStammtisch ? new Date(2026,6,21) : new Date();
+    const todayRef = new Date();
     const parseDate_=ds=>{ if(typeof ds==='string' && /^\d{4}-\d{2}-\d{2}/.test(ds)) return new Date(ds.slice(0,10)+'T00:00:00'); const d=new Date(ds); return isNaN(d.getTime())?new Date():d; };
-    const resolveDrink_=key=>this.getDrinksList().find(d=>d.id===key||d.label===key);
+    const norm_=s=>String(s||'').toLowerCase().replace(/\s*\(.*?\)/g,'').replace(/[^a-zäöüß0-9]/g,'');
+    const resolveDrink_=key=>{
+      const L=this.getDrinksList();
+      return L.find(d=>d.id===key||d.label===key)
+          || L.find(d=>norm_(d.label)===norm_(key))
+          || L.find(d=>norm_(d.label).startsWith(norm_(key))||norm_(key).startsWith(norm_(d.label)));
+    };
     const normItems_=items=>{ const out={}; Object.entries(items||{}).forEach(([k,c])=>{ const d=resolveDrink_(k); const id=d?d.id:k; out[id]=(out[id]||0)+c; }); return out; };
     const liveItems = s.drinks[me.id]||{};
     const liveHasData = Object.values(liveItems).some(v=>v>0);
-    const allEntries = [...(s.remoteHistory||this.drinkHistory).filter(e=>e.mid===me.id), ...(liveHasData?[{date:todayRef.toISOString().slice(0,10),items:liveItems}]:[])]
+    const todayStr_ = todayRef.toISOString().slice(0,10);
+    const allEntries = (s.remoteHistory||this.drinkHistory).filter(e=>e.mid===me.id)
       .map(e=>({...e,items:normItems_(e.items)}));
     const inPeriod = e=>{
       const d=parseDate_(e.date);
@@ -1194,47 +1469,93 @@ class Component extends DCLogic {
     const statsPeriods=[['month','Monat'],['year','Jahr'],['all','Gesamt']].map(([p,label])=>({label,select:()=>this.setStatsPeriod(p),
       bg:s.statsPeriod===p?'#1a3a2a':'#fff8ec',color:s.statsPeriod===p?'#fff':'#5c4c38',border:s.statsPeriod===p?'#1a3a2a':'#e4d5b8'}));
     const monNames=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    const lastStDate_ = this.currentStammtischDate();
     const statsSessions = [...allEntries].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6).map((e,i)=>{
       const d=parseDate_(e.date); const cnt=Object.values(e.items).reduce((a,b)=>a+b,0);
       const cost=Object.keys(e.items).reduce((a,id)=>{ const d=resolveDrink_(id); return a+e.items[id]*(d?d.price:0); },0);
       const key=e.date+'|'+i; const isOpen=s.openSessionKey===key;
-      const items=Object.keys(e.items).filter(id=>e.items[id]>0).map(id=>{ const d=resolveDrink_(id); return {label:d?d.label:id, count:e.items[id]}; });
+      const editable = i===0 && e.date>=lastStDate_;
+      const items=Object.keys(e.items).filter(id=>e.items[id]>0).map(id=>{ const dd=resolveDrink_(id);
+        return {label:dd?dd.label:id, count:e.items[id], editable,
+          plus:()=>this.editSessionDrink(e.date,id,1), minus:()=>this.editSessionDrink(e.date,id,-1)}; });
+      const addOptions = editable ? this.getDrinksList().filter(dd=>!(e.items[dd.id]>0)).map(dd=>({
+        id:dd.id, label:dd.label, add:()=>this.editSessionDrink(e.date,dd.id,1) })) : [];
       return {dateLabel:d.getDate()+'. '+monNames[d.getMonth()]+' '+d.getFullYear(),countLabel:cnt+' Getränke',cost:eur2(cost),
-        toggle:()=>this.toggleSession(key),isOpen,chevron:isOpen?'▲':'▼',items};
+        toggle:()=>this.toggleSession(key),isOpen,chevron:isOpen?'▲':'▼',items,
+        editable, notEditable:!editable, addOptions, hasAddOptions:addOptions.length>0};
     });
 
     // Rangliste: nur Biere (Kleines/Großes Helles, Weizen), alle Mitglieder im gewaehlten Zeitraum
     const beerIds = this.getDrinksList().filter(d=>d.beer).map(d=>d.id);
-    const remoteAll = (s.remoteHistory || this.drinkHistory).map(e=>({...e,items:normItems_(e.items)}));
-    const liveByMid = liveHasData ? { [me.id]: liveItems } : {};
-    const allDrinkEntries = [...remoteAll, ...Object.entries(liveByMid).map(([mid,items])=>({date:todayRef.toISOString().slice(0,10),mid,items:normItems_(items)}))];
+    const allDrinkEntries = (s.remoteHistory || this.drinkHistory).map(e=>({...e,items:normItems_(e.items)}));
     const drinkPeriodEntries = allDrinkEntries.filter(inPeriod);
     const totalsByMember = {};
     drinkPeriodEntries.forEach(e=>{
       const beerItems=Object.fromEntries(Object.entries(e.items).filter(([id])=>beerIds.includes(id)));
       const cnt=Object.values(beerItems).reduce((a,b)=>a+b,0); const cost=this.getDrinksList().reduce((a,d)=>a+(beerItems[d.id]||0)*d.price,0);
-      if(!totalsByMember[e.mid]) totalsByMember[e.mid]={count:0,cost:0}; totalsByMember[e.mid].count+=cnt; totalsByMember[e.mid].cost+=cost;
+      if(!totalsByMember[e.mid]) totalsByMember[e.mid]={count:0,cost:0,items:{},dates:new Set()};
+      totalsByMember[e.mid].count+=cnt; totalsByMember[e.mid].cost+=cost;
+      totalsByMember[e.mid].dates.add(e.date);
+      Object.entries(e.items).forEach(([id,n])=>{ totalsByMember[e.mid].items[id]=(totalsByMember[e.mid].items[id]||0)+n; });
     });
+    const memberDetail_ = mid => {
+      const t = totalsByMember[mid]; if(!t) return [];
+      return Object.entries(t.items).filter(([,n])=>n>0).map(([id,n])=>{
+        const d = resolveDrink_(id);
+        return { label:d?d.label:id, count:n+'×', sum:eur2(n*(d?d.price:0)), isBeer:!!(d&&d.beer) };
+      }).sort((a,b)=>parseInt(b.count)-parseInt(a.count));
+    };
     const leaderboard = M.map(m=>({ m, count:(totalsByMember[m.id]||{count:0}).count, cost:(totalsByMember[m.id]||{cost:0}).cost }))
       .filter(r=>r.count>0).sort((a,b)=>b.count-a.count)
       .map((r,i)=>({ rank:i+1, name:r.m.name, initials:this.initials(r.m.name), color:r.m.color, count:r.count, cost:eur2(r.cost),
+        open:s.boardOpenMid===r.m.id, toggle:()=>this.toggleBoardMember(r.m.id),
+        chevron:s.boardOpenMid===r.m.id?'▾':'▸',
+        detail:s.boardOpenMid===r.m.id?memberDetail_(r.m.id):[],
+        detailHasRows:s.boardOpenMid===r.m.id && memberDetail_(r.m.id).length>0,
+        sessionsLabel:((totalsByMember[r.m.id]||{dates:new Set()}).dates.size)+'× dabei',
         isMe:r.m.id===me.id, rowBg:r.m.id===me.id?'#fff3d0':'#fff8ec', rowBorder:r.m.id===me.id?'#e8c65f':'#e4d5b8' }));
 
     // Anwesenheit: wie oft war wer im Zeitraum da (jeder geloggte Getraenke-Eintrag zaehlt automatisch als Anwesenheit)
     const attDateSets_ = {};
     const addAttDate_=(mid,date)=>{ if(!inPeriod({date})) return; (attDateSets_[mid]=attDateSets_[mid]||new Set()).add(date); };
-    this.attendanceHistory.forEach(e=>addAttDate_(e.mid,e.date));
+    const hasRemote = !!s.remoteHistory;
+    if(!hasRemote && s.attendanceLog.length===0) this.attendanceHistory.forEach(e=>addAttDate_(e.mid,e.date));
+    const attLog_ = s.attendanceLog.filter(e=>!String(e.mid).startsWith('!'));
+    const attHidden_ = s.attendanceLog.filter(e=>String(e.mid).startsWith('!')).map(e=>({date:e.date,mid:String(e.mid).slice(1)}));
+    attLog_.forEach(e=>addAttDate_(e.mid,e.date));
     (s.remoteHistory||this.drinkHistory).forEach(e=>addAttDate_(e.mid,e.date));
-    if(isYes(me.id)) addAttDate_(me.id, todayRef.toISOString().slice(0,10));
-    if(liveHasData) addAttDate_(me.id, todayRef.toISOString().slice(0,10));
+    
+    attHidden_.forEach(e=>{ if(attDateSets_[e.mid]) attDateSets_[e.mid].delete(e.date); });
     const attCounts = {};
     Object.keys(attDateSets_).forEach(mid=>{ attCounts[mid]=attDateSets_[mid].size; });
     const attendanceBoard = M.map(m=>({ m, count:attCounts[m.id]||0 })).filter(r=>r.count>0).sort((a,b)=>b.count-a.count)
       .map((r,i)=>({ rank:i+1, name:r.m.name, initials:this.initials(r.m.name), color:r.m.color, countLabel:r.count+(r.count===1?'× dabei':'× dabei'),
         isMe:r.m.id===me.id, rowBg:r.m.id===me.id?'#fff3d0':'#fff8ec', rowBorder:r.m.id===me.id?'#e8c65f':'#e4d5b8' }));
 
-    const statsViewIsMe = s.statsView==='me';
-    const statsTabs=[['me','Meine Werte'],['board','Rangliste']].map(([v,label])=>({label,select:()=>this.setStatsView(v),
+    // Admin: Anwesenheitstermine bearbeiten
+    const attByDate_ = {};
+    const regAtt_=(date,mid,src)=>{ (attByDate_[date]=attByDate_[date]||{})[mid]=(attByDate_[date][mid]||src); };
+    attLog_.forEach(e=>regAtt_(e.date,e.mid,'log'));
+    (s.remoteHistory||[]).forEach(e=>regAtt_(e.date,e.mid,'drinks'));
+    attHidden_.forEach(e=>{ if(attByDate_[e.date]){ delete attByDate_[e.date][e.mid];
+      if(!Object.keys(attByDate_[e.date]).length) delete attByDate_[e.date]; } });
+    const monNamesA=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    const fmtDate_=ds=>{ const d=parseDate_(ds); return d.getDate()+'. '+monNamesA[d.getMonth()]+' '+d.getFullYear(); };
+    const adminAttDates = Object.keys(attByDate_).sort((a,b)=>b.localeCompare(a)).map(date=>({
+      date, dateLabel:fmtDate_(date),
+      people:Object.keys(attByDate_[date]).map(mid=>{
+        const mm=M.find(x=>x.id===mid);
+        return { mid, name:mm?mm.name:mid, initials:this.initials(mm?mm.name:mid), color:mm?mm.color:'#8a7860',
+          fromDrinks:attByDate_[date][mid]==='drinks',
+          canRemove:true,
+          remove:()=>this.adminRemoveAttendance(mid,date,attByDate_[date][mid]==='drinks') };
+      }).sort((a,b)=>a.name.localeCompare(b.name,'de'))
+    }));
+    const adminAttPickList = M.map(m=>({ name:m.name, initials:this.initials(m.name), color:m.color,
+      sel:s.adminAttMid===m.id, ring:s.adminAttMid===m.id?'#2f5d3f':'transparent', op:s.adminAttMid===m.id?'1':'.5',
+      select:()=>this.setAdminAttMid(m.id) }));
+
+    const statsViewIsMe = s.statsView==='me';    const statsTabs=[['me','Meine Werte'],['board','Rangliste']].map(([v,label])=>({label,select:()=>this.setStatsView(v),
       bg:s.statsView===v?'#1a3a2a':'#fff8ec',color:s.statsView===v?'#fff':'#5c4c38',border:s.statsView===v?'#1a3a2a':'#e4d5b8'}));
 
     const fasanHours=[
@@ -1282,6 +1603,7 @@ class Component extends DCLogic {
       setAdminDrinkPrice:e=>this.setAdminDrinkDraft('price',e.target.value),
       toggleAdminDrinkBeer:()=>this.toggleAdminDrinkBeer(),
       saveDrink:()=>this.saveDrink(), cancelEditDrink:()=>this.cancelEditDrink(),
+      syncMenuPrices:()=>this.syncMenuPrices(), priceSyncMsg:s.priceSyncMsg, hasPriceSyncMsg:!!s.priceSyncMsg,
       isEditingDrink:!!s.adminEditDrinkId, drinkSaveLabel:s.adminEditDrinkId?'Änderungen speichern':'+ Getränk hinzufügen',
       goInfo:this.go('info'),goHome:this.go('home'),goRunde:this.go('runde'),logout:()=>this.logout(),
       fasanHours,fasanServices,
@@ -1309,10 +1631,15 @@ class Component extends DCLogic {
       dartInputShow:s.dartInput===''?'–':s.dartInput,dartKeys,dartUndo:()=>this.dartUndo(),dartReset:()=>this.requestDartReset(),
       dartConfirmReset:s.dartConfirmReset,confirmDartReset:()=>this.confirmDartReset(),cancelDartReset:()=>this.cancelDartReset(),
       cricketRows,cricketPlayers,
+      liveTallyOpen:liveHasData,liveTallyCount:Object.values(liveItems).reduce((a,b)=>a+b,0),
       statsPeriods,statsPeriodLabel:periodMeta[s.statsPeriod],statsCount:statsCountTotal,statsCost:statsCostTotal,
       statsBreakdown,statsHasData:statsBreakdown.length>0,statsNoData:statsBreakdown.length===0,statsSessions,
       statsTabs,statsViewIsMe,statsViewIsBoard:!statsViewIsMe,leaderboard,hasLeaderboard:leaderboard.length>0,leaderboardEmpty:leaderboard.length===0,
       attendanceBoard,hasAttendanceBoard:attendanceBoard.length>0,attendanceBoardEmpty:attendanceBoard.length===0,
+      adminAttDates,hasAdminAttDates:adminAttDates.length>0,adminAttDatesEmpty:adminAttDates.length===0,
+      adminAttPickList,adminAttDate:s.adminAttDate,setAdminAttDate:e=>this.setAdminAttDate(e.target.value),
+      pastStammtische:this.pastStammtische,
+      adminAddAttendance:()=>this.adminAddAttendance(),adminAttCanAdd:!!(s.adminAttMid&&s.adminAttDate),adminAttAddOpacity:(s.adminAttMid&&s.adminAttDate)?'1':'.5',
       dartPickerOptions,dartPickerOpen:s.dartPickerOpen,toggleDartPicker:()=>this.toggleDartPicker(),
       dartVsLabel,dartCanRemove:s.dartPlayerIds.length>2,
       dartStarted:s.dartStarted,dartNotStarted:!s.dartStarted,startDartRound:()=>this.startDartRound(),endDartRound:()=>this.endDartRound(),
