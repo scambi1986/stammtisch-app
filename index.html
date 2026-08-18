@@ -733,6 +733,14 @@
                   </sc-for>
                 </div>
                 </sc-if>
+                <sc-if value="{{ s.dirty }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:9px;margin-top:6px">
+                  <button onClick="{{ s.save }}" style="flex:1;border:none;background:#2f5d3f;color:#f3e8d2;font:600 13px 'Work Sans';padding:9px;border-radius:11px;cursor:pointer">Änderungen speichern</button>
+                  <sc-if value="{{ s.saveMsg }}" hint-placeholder-val="{{ false }}">
+                  <div style="font:600 12px 'Work Sans';color:#2f5d3f;white-space:nowrap">{{ s.saveMsg }}</div>
+                  </sc-if>
+                </div>
+                </sc-if>
                 <sc-if value="{{ s.notEditable }}" hint-placeholder-val="{{ false }}">
                 <div style="font:500 11px 'Work Sans';color:#a3907a;margin-top:4px">Nur der letzte Termin lässt sich noch ändern.</div>
                 </sc-if>
@@ -924,6 +932,8 @@ class Component extends DCLogic {
     statsPeriod:this.props.defaultStatsPeriod ?? 'month',
     statsView:'me',
     openSessionKey:null,
+    sessionDirty:{},
+    sessSaveMsg:'',
     customDrinks:{},
     attendanceLog:[],
     adminAttDate:'',
@@ -1100,10 +1110,32 @@ class Component extends DCLogic {
         if(next<=0) delete items[key]; else items[key]=next;
         hist[i]={...hist[i],items};
       }
-      return { remoteHistory:hist };
+      return { remoteHistory:hist, sessionDirty:{...st.sessionDirty, [date]:true}, sessSaveMsg:'' };
     });
-    const q = this.pushDrinkToSheet(me, did, delta, date);
-    if(delta<0 && q && q.then) q.then(()=>this.ensureSessionItems(date));
+  }
+  // Schreibt die (lokal geänderten) Werte einer Session absolut ins Sheet
+  saveSessionDrinks(date){
+    const url=this.state.sheetUrl;
+    if(!url){ this.setState({ sessSaveMsg:'Kein Sheet verbunden' }); return; }
+    const me=this.state.currentUser;
+    const e=(this.state.remoteHistory||[]).find(x=>x.date===date&&x.mid===me);
+    const items={};
+    Object.entries((e&&e.items)||{}).forEach(([k,n])=>{
+      const known=this.getDrinksList().find(d=>d.id===k||d.label===k);
+      const key=known?known.label:k;
+      const v=Number(n)||0;
+      if(v>0) items[key]=(Number(items[key])||0)+v;
+    });
+    this.setState({ sessSaveMsg:'Speichere …' });
+    fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({ action:'setSessionDrinks', mid:me, date, items }),
+    }).then(()=>{
+      this.setState(st=>{ const d={...st.sessionDirty}; delete d[date]; return { sessionDirty:d, sessSaveMsg:'Gespeichert ✓' }; });
+      setTimeout(()=>{ this.fetchSheetHistory(); }, 1200);
+      setTimeout(()=>this.setState({ sessSaveMsg:'' }), 3000);
+    }).catch(()=>this.setState({ sessSaveMsg:'Fehler beim Speichern' }));
   }
   // Das Sheet entfernt die Zeile, wenn eine Spalte auf 0 fällt – übrige Werte danach neu setzen
   ensureSessionItems(date){
@@ -1717,7 +1749,9 @@ class Component extends DCLogic {
         id:dd.id, label:dd.label, add:()=>this.editSessionDrink(e.date,dd.id,1) })) : [];
       return {dateLabel:d.getDate()+'. '+monNames[d.getMonth()]+' '+d.getFullYear(),countLabel:cnt+' Getränke',cost:eur2(cost),
         toggle:()=>this.toggleSession(key),isOpen,chevron:isOpen?'▲':'▼',items,
-        editable, notEditable:!editable, addOptions, hasAddOptions:addOptions.length>0};
+        editable, notEditable:!editable, addOptions, hasAddOptions:addOptions.length>0,
+        dirty:!!s.sessionDirty[e.date], saveMsg:s.sessSaveMsg,
+        save:()=>this.saveSessionDrinks(e.date)};
     });
 
     // Rangliste: nur Biere (Kleines/Großes Helles, Weizen), alle Mitglieder im gewaehlten Zeitraum
