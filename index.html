@@ -1003,9 +1003,54 @@ class Component extends DCLogic {
           if(!merged[key]) merged[key] = { date, mid:e.mid, items:{} };
           Object.entries(e.items||{}).forEach(([k,n])=>{ merged[key].items[k]=(Number(merged[key].items[k])||0)+(Number(n)||0); });
         });
-        this.setState({ remoteHistory: Object.values(merged), sheetStatus:'ok' });
+        const list = Object.values(merged);
+        // Lokale Werte schützen: gerade gespeicherte und noch ungespeicherte Sessions
+        // dürfen nicht von einem älteren Sheet-Stand überschrieben werden.
+        const now = Date.now();
+        const ov = this._sessionOverride = this._sessionOverride || {};
+        Object.keys(ov).forEach(k=>{ if(ov[k].until < now) delete ov[k]; });
+        const prev = this.state.remoteHistory || [];
+        const me = this.state.currentUser;
+        const dirty = this.state.sessionDirty || {};
+        const keep = {};
+        Object.keys(ov).forEach(k=>{
+          const e = list.find(x=>x.date+'|'+x.mid===k);
+          // Sheet ist angekommen -> Override wird nicht mehr gebraucht
+          if(e && this.sameItems(e.items, ov[k].items)) delete ov[k];
+        });
+        Object.keys(ov).forEach(k=>{ keep[k] = ov[k].items; });
+        Object.keys(dirty).forEach(date=>{
+          const p = prev.find(x=>x.date===date && x.mid===me);
+          if(p) keep[date+'|'+me] = p.items;
+        });
+        Object.entries(keep).forEach(([k,items])=>{
+          const e = list.find(x=>x.date+'|'+x.mid===k);
+          if(e) e.items = {...items};
+          else { const [d,m] = k.split('|'); list.push({ date:d, mid:m, items:{...items} }); }
+        });
+        this.setState({ remoteHistory: list, sheetStatus:'ok' });
       })
       .catch(()=>this.setState({ sheetStatus:'error' }));
+  }
+  // Vergleicht zwei Getränke-Maps nach Label normalisiert
+  normToLabels(items){
+    const out={};
+    Object.entries(items||{}).forEach(([k,n])=>{
+      const known=this.getDrinksList().find(d=>d.id===k||d.label===k);
+      const key=known?known.label:k;
+      const v=Number(n)||0;
+      if(v>0) out[key]=(Number(out[key])||0)+v;
+    });
+    return out;
+  }
+  sameItems(a,b){
+    const x=this.normToLabels(a), y=this.normToLabels(b);
+    const kx=Object.keys(x), ky=Object.keys(y);
+    return kx.length===ky.length && kx.every(k=>x[k]===y[k]);
+  }
+  // Sobald eine Session anderweitig lokal verändert wird, darf der Override nicht mehr greifen
+  clearSessionOverride(mid, date){
+    if(this._sessionOverride) delete this._sessionOverride[date+'|'+mid];
   }
   pushDrinkToSheet(mid, did, delta, dateStr){
     const url=this.state.sheetUrl;
@@ -1013,6 +1058,7 @@ class Component extends DCLogic {
     const known = this.getDrinksList().find(d=>d.id===did || d.label===did);
     if(known) did = known.label;
     dateStr = this.stammtischDateOf(dateStr || this.currentStammtischDate());
+    this.clearSessionOverride(mid, dateStr);
     const p = fetch(url, {
       method:'POST',
       headers:{'Content-Type':'text/plain'},
@@ -1132,8 +1178,10 @@ class Component extends DCLogic {
       headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({ action:'setSessionDrinks', mid:me, date, items }),
     }).then(()=>{
+      this._sessionOverride = this._sessionOverride || {};
+      this._sessionOverride[date+'|'+me] = { items:{...items}, until:Date.now()+120000 };
       this.setState(st=>{ const d={...st.sessionDirty}; delete d[date]; return { sessionDirty:d, sessSaveMsg:'Gespeichert ✓' }; });
-      setTimeout(()=>{ this.fetchSheetHistory(); }, 1200);
+      setTimeout(()=>{ this.fetchSheetHistory(); }, 2500);
       setTimeout(()=>this.setState({ sessSaveMsg:'' }), 3000);
     }).catch(()=>this.setState({ sessSaveMsg:'Fehler beim Speichern' }));
   }
@@ -1559,6 +1607,7 @@ class Component extends DCLogic {
           const d=this.getDrinksList().find(x=>x.id===did); const key=d?d.label:did;
           merged[key]=(Number(merged[key])||0)+n; });
         if(i>=0) hist[i]={...hist[i],items:merged}; else hist.push({date:today,mid:me,items:merged});
+        this.clearSessionOverride(me, today);
         return { remoteHistory:hist };
       });
     }

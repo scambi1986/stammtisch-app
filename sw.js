@@ -1,5 +1,5 @@
 // Service Worker – Hundefreunde Hasloh Stammtisch-App
-const CACHE = 'stammtisch-v4';
+const CACHE = 'stammtisch-v6';
 const APP_SHELL = [
   './',
   './index.html',
